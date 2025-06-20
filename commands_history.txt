@@ -1,0 +1,13 @@
+// Install uv environment manager
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+// Install python
+uv python install
+
+// Install manim
+cd special-relativity-sim
+uv init manimations
+cd manimations
+uv add manim
+
+pip install manim
