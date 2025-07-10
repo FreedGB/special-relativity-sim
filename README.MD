@@ -21,6 +21,3 @@ sudo cp raygui.h /usr/include
 ```
 
 And you are done!
-
-
-
