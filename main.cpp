@@ -24,32 +24,31 @@
 // Class
 class Event
 {
-    float __x;
-    float __t;
-    Color __color;
-    bool __hovered;
+    float x;
+    float t;
+    Color color;
 
     public:
         
         /**
          * Create an event (a spacetime point).
          * @constructor 
-         * @param __x The space coordinate (1.0 -> 3.10^8 m).
-         * @param __t The time coordinate (in seconds).
+         * @param x The space coordinate (1.0 -> 3.10^8 m).
+         * @param t The time coordinate (in seconds).
          * @return A spacetime point.
         */
         Event(float x, float t, Color color)
         {
-            this->__x = x;
-            this->__t = t;
-            this->__color = color;
+            this->x = x;
+            this->t = t;
+            this->color = color;
         }
 
-        void setX(float x) { this->__x = x; }
-        void setT(float t) { this->__t = t; }
-        float getX() { return this->__x; }
-        float getT() { return this->__t; }
-        Color getColor() { return this->__color; }
+        void setX(float x) { this->x = x; }
+        void setT(float t) { this->t = t; }
+        float getX() { return this->x; }
+        float getT() { return this->t; }
+        Color getColor() { return this->color; }
 };
 
 
@@ -74,6 +73,9 @@ int main()
     float currentX;
     float currentY;
     std::vector<Event> eventsList;
+    bool draggingMode;
+    Vector2 mousePosition;
+    int eventDraggedIndex;
 
     // Define and initialize generic limit points
     Event e0 = Event(0.0, 0.0, BLACK);
@@ -89,6 +91,7 @@ int main()
     Event p3Prime = Event(0.0, 0.0, BLACK);
     Event p4Prime = Event(0.0, 0.0, BLACK);
 
+
     // Game loop
     while (!WindowShouldClose())
     {   
@@ -96,6 +99,39 @@ int main()
         globeHeight = GetScreenHeight() - 3 * MARGIN;
         panelWidth = GetScreenWidth()/3 - MARGIN;
         panelHeight = globeHeight;
+
+        // Drag and drop logic
+        draggingMode = false;
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+        {
+            mousePosition = GetMousePosition();
+            for (int i = 0; i < eventsList.size(); i++)
+            {
+                Vector2 eventScreenCoordinates = (Vector2)
+                {
+                    WorldToScreenX(eventsList[i].getX(), globeWidth/2),
+                    WorldToScreenY(eventsList[i].getT(), globeHeight/2)
+                };
+
+                if (CheckCollisionPointCircle(mousePosition, eventScreenCoordinates, EVENT_RADIUS + 10))
+                {
+                    draggingMode = true;
+                    eventDraggedIndex = i;
+                    break;
+                }
+            }
+        }
+        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+        {
+            draggingMode = false;
+        }
+
+        if (draggingMode)
+        {
+            mousePosition = GetMousePosition();
+            eventsList[eventDraggedIndex].setX(ScreenToWorldX(mousePosition.x, globeWidth/2));
+            eventsList[eventDraggedIndex].setT(ScreenToWorldY(mousePosition.y, globeHeight/2));
+        }
 
         
         BeginDrawing();
@@ -262,6 +298,14 @@ int main()
                 eventsList.push_back(Event(1.0, 1.0, BLUE));
             }
             DrawRectangleV((Vector2){currentX, currentY}, (Vector2){60, 30}, BLUE);
+            DrawRectangleLinesEx((Rectangle){currentX, currentY, 60, 30}, 2.0, BLACK);
+
+            currentX += 60 + 20;
+            if (GuiButton((Rectangle){currentX, currentY, 60, 30}, ""))
+            {
+                eventsList.push_back(Event(-1.0, -1.0, GREEN));
+            }
+            DrawRectangleV((Vector2){currentX, currentY}, (Vector2){60, 30}, GREEN);
             DrawRectangleLinesEx((Rectangle){currentX, currentY, 60, 30}, 2.0, BLACK);
 
             // Clear button
