@@ -1,3 +1,4 @@
+#include <vector>
 #include "raylib.h"
 
 #define RAYGUI_IMPLEMENTATION
@@ -15,6 +16,9 @@
 #define SECONDARY_GRID_THICKNESS 1.0
 #define GRID_SPACING 50
 #define C 1.0
+#define EVENT_RADIUS 10.0
+#define EVENT_BUTTON_HEIGHT 60
+#define EVENT_BUTTON_WIDTH 30
 
 
 // Class
@@ -22,6 +26,8 @@ class Event
 {
     float __x;
     float __t;
+    Color __color;
+    bool __hovered;
 
     public:
         
@@ -32,15 +38,18 @@ class Event
          * @param __t The time coordinate (in seconds).
          * @return A spacetime point.
         */
-        Event(float x, float t)
+        Event(float x, float t, Color color)
         {
             this->__x = x;
             this->__t = t;
+            this->__color = color;
         }
 
+        void setX(float x) { this->__x = x; }
+        void setT(float t) { this->__t = t; }
         float getX() { return this->__x; }
         float getT() { return this->__t; }
-
+        Color getColor() { return this->__color; }
 };
 
 
@@ -53,7 +62,8 @@ float ScreenToWorldY(float screenY, int offsetY);
 
 int main()
 {
-    InitWindow(800, 250, "SPACETIME GLOBE SIMULATION");
+    // Game definitions
+    InitWindow(1000, 500, "SPACETIME GLOBE SIMULATION");
     SetTargetFPS(60);
 
     int globeWidth;
@@ -61,21 +71,25 @@ int main()
     float panelWidth;
     float panelHeight;
     float velocity;
+    float currentX;
+    float currentY;
+    std::vector<Event> eventsList;
 
     // Define and initialize generic limit points
-    Event e0 = Event(0.0, 0.0);
-    Event e1 = Event(0.0, 0.0);
-    Event p1 = Event(0.0, 0.0);
-    Event p2 = Event(0.0, 0.0);
-    Event p3 = Event(0.0, 0.0);
-    Event p4 = Event(0.0, 0.0);
-    Event e0Prime = Event(0.0, 0.0);
-    Event e1Prime = Event(0.0, 0.0);
-    Event p1Prime = Event(0.0, 0.0);
-    Event p2Prime = Event(0.0, 0.0);
-    Event p3Prime = Event(0.0, 0.0);
-    Event p4Prime = Event(0.0, 0.0);
+    Event e0 = Event(0.0, 0.0, BLACK);
+    Event e1 = Event(0.0, 0.0, BLACK);
+    Event p1 = Event(0.0, 0.0, BLACK);
+    Event p2 = Event(0.0, 0.0, BLACK);
+    Event p3 = Event(0.0, 0.0, BLACK);
+    Event p4 = Event(0.0, 0.0, BLACK);
+    Event e0Prime = Event(0.0, 0.0, BLACK);
+    Event e1Prime = Event(0.0, 0.0, BLACK);
+    Event p1Prime = Event(0.0, 0.0, BLACK);
+    Event p2Prime = Event(0.0, 0.0, BLACK);
+    Event p3Prime = Event(0.0, 0.0, BLACK);
+    Event p4Prime = Event(0.0, 0.0, BLACK);
 
+    // Game loop
     while (!WindowShouldClose())
     {   
         globeWidth = (2 * GetScreenWidth())/3 - 2 * MARGIN;
@@ -89,11 +103,10 @@ int main()
 
             // Draw windows
             DrawRectangleLinesEx((Rectangle){MARGIN, MARGIN, globeWidth, globeHeight}, BORDER_THICKNESS, GRID_COLOR);
-            GuiPanel((Rectangle){(2.0 * GetScreenWidth())/3, MARGIN, panelWidth, panelHeight }, "Control panel");
+            GuiPanel((Rectangle){globeWidth + 2*MARGIN, MARGIN, panelWidth, panelHeight}, "Control panel");
 
-            // Add velocity slider
-            GuiSlider((Rectangle){(2.0 * GetScreenWidth())/3 + 30, MARGIN + 40, panelWidth - 200, 20}, "-C", "C", &velocity, -1.0*C, 1.0*C);
-            DrawText(TextFormat("v = %.2f c", velocity), 2*MARGIN + globeWidth + panelWidth - 120, MARGIN + 40, 20, TEXT_COLOR);
+            
+            // --- Spacetime Globe ---
 
             // Draw labels
             DrawText("space", MARGIN + globeWidth - 70, MARGIN + globeHeight/2 + 10, 20, TEXT_COLOR);
@@ -114,8 +127,8 @@ int main()
             );
 
             // Grid
-            e0 = Event(0.0, ScreenToWorldY(MARGIN, globeHeight/2));
-            e1 = Event(0.0, ScreenToWorldY(MARGIN + globeHeight, globeHeight/2));
+            e0 = Event(0.0, ScreenToWorldY(MARGIN, globeHeight/2), BLACK);
+            e1 = Event(0.0, ScreenToWorldY(MARGIN + globeHeight, globeHeight/2), BLACK);
             e0Prime = LorentzTransform(e0, velocity);
             e1Prime = LorentzTransform(e1, velocity);
             DrawLineEx(
@@ -128,11 +141,10 @@ int main()
             for (int i = 1; i <= s/2; i++)
             {
                 
-                p1 = Event(-i, ScreenToWorldY(MARGIN, globeHeight/2));
-                p2 = Event(-i, ScreenToWorldY(MARGIN + globeHeight, globeHeight/2));
-                p3 = Event(i, ScreenToWorldY(MARGIN, globeHeight/2));
-                p4 = Event(i, ScreenToWorldY(MARGIN + globeHeight, globeHeight/2));
-
+                p1 = Event(-i, ScreenToWorldY(MARGIN, globeHeight/2), BLACK);
+                p2 = Event(-i, ScreenToWorldY(MARGIN + globeHeight, globeHeight/2), BLACK);
+                p3 = Event(i, ScreenToWorldY(MARGIN, globeHeight/2), BLACK);
+                p4 = Event(i, ScreenToWorldY(MARGIN + globeHeight, globeHeight/2), BLACK);
                 
                 p1Prime = LorentzTransform(p1, velocity);
                 p2Prime = LorentzTransform(p2, velocity);
@@ -170,8 +182,8 @@ int main()
 
             }
 
-            e0 = Event(ScreenToWorldX(MARGIN, globeWidth/2), 0.0);
-            e1 = Event(ScreenToWorldX(MARGIN + globeWidth, globeWidth/2), 0.0);
+            e0 = Event(ScreenToWorldX(MARGIN, globeWidth/2), 0.0, BLACK);
+            e1 = Event(ScreenToWorldX(MARGIN + globeWidth, globeWidth/2), 0.0, BLACK);
             e0Prime = LorentzTransform(e0, velocity);
             e1Prime = LorentzTransform(e1, velocity);
             DrawLineEx(
@@ -183,10 +195,10 @@ int main()
             int t = globeHeight / GRID_SPACING;
             for (int i = 1; i <= t/2; i++)
             {
-                p1 = Event(ScreenToWorldX(MARGIN, globeWidth/2), -i);
-                p2 = Event(ScreenToWorldX(MARGIN + globeWidth, globeWidth/2), -i);
-                p3 = Event(ScreenToWorldX(MARGIN, globeWidth/2), i);
-                p4 = Event(ScreenToWorldX(MARGIN + globeWidth, globeWidth/2), i);
+                p1 = Event(ScreenToWorldX(MARGIN, globeWidth/2), -i, BLACK);
+                p2 = Event(ScreenToWorldX(MARGIN + globeWidth, globeWidth/2), -i, BLACK);
+                p3 = Event(ScreenToWorldX(MARGIN, globeWidth/2), i, BLACK);
+                p4 = Event(ScreenToWorldX(MARGIN + globeWidth, globeWidth/2), i, BLACK);
 
                 p1Prime = LorentzTransform(p1, velocity);
                 p2Prime = LorentzTransform(p2, velocity);
@@ -222,7 +234,54 @@ int main()
                     GRID_COLOR
                 );
             }
+
+
+            // --- Control panel ---
+
+            // Velocity slider
+            currentX = globeWidth + 2*MARGIN + 30;
+            currentY = MARGIN + 60;
+            // GuiLabel((Rectangle){globeWidth + 2*MARGIN + 30, MARGIN + 40, panelWidth - 30, 20}, "Velocity slider");
+            GuiSlider((Rectangle){currentX, currentY, panelWidth - 200, 20}, "-C", "C", &velocity, -1.0*C, 1.0*C);
+            currentX += panelWidth - 150;
+            DrawText(TextFormat("v = %.2f c", velocity), currentX, currentY, 20, TEXT_COLOR);
+
+            // Add event
+            currentX = globeWidth + 2*MARGIN + 30;
+            currentY += 50;
+            if (GuiButton((Rectangle){currentX, currentY, 60, 30}, ""))
+            {
+                eventsList.push_back(Event(0.0, 0.0, RED));
+            }
+            DrawRectangleV((Vector2){currentX, currentY}, (Vector2){60, 30}, RED);
+            DrawRectangleLinesEx((Rectangle){currentX, currentY, 60, 30}, 2.0, BLACK);
+
+            currentX += 60 + 20;
+            if (GuiButton((Rectangle){currentX, currentY, 60, 30}, ""))
+            {
+                eventsList.push_back(Event(1.0, 1.0, BLUE));
+            }
+            DrawRectangleV((Vector2){currentX, currentY}, (Vector2){60, 30}, BLUE);
+            DrawRectangleLinesEx((Rectangle){currentX, currentY, 60, 30}, 2.0, BLACK);
+
+            // Clear button
+            currentX = globeWidth + 2*MARGIN + 30 + panelWidth - 120;
+            currentY += 50;
+            if (GuiButton((Rectangle){currentX, currentY, 60, 30}, "Clear all"))
+            {
+                eventsList.clear();
+            }
             
+            // Draw events
+            for (Event e: eventsList)
+            {
+                Event ePrime = LorentzTransform(e, velocity);
+                DrawCircleV(
+                    (Vector2) {WorldToScreenX(ePrime.getX(), globeWidth/2), WorldToScreenY(ePrime.getT(), globeHeight/2)},
+                    EVENT_RADIUS,
+                    ePrime.getColor()
+                );
+            }
 
         EndDrawing();
     }
@@ -238,7 +297,7 @@ Event LorentzTransform(Event point, float velocity)
     float x_prime = gamma * (point.getX() - velocity * point.getT());
     float t_prime = gamma * (point.getT() - (velocity * point.getX() / pow(C, 2)));
     
-    return Event(x_prime, t_prime);
+    return Event(x_prime, t_prime, point.getColor());
 }
 
 float WorldToScreenX(float worldX, int offsetX)
