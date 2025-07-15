@@ -66,8 +66,8 @@ int main()
     InitWindow(1000, 500, "SPACETIME GLOBE SIMULATION");
     SetTargetFPS(60);
 
-    int globeWidth;
-    int globeHeight;
+    float globeWidth;
+    float globeHeight;
     float panelWidth;
     float panelHeight;
     float observerVelocity;
@@ -82,10 +82,10 @@ int main()
     int activeToggle = -1;
 
     // Define and initialize generic limit points
-    Event e_lab_0 = Event(0.0, 0.0, BLACK);
-    Event e_lab_1 = Event(0.0, 0.0, BLACK);
-    Event e_lab_2 = Event(0.0, 0.0, BLACK);
-    Event e_lab_3 = Event(0.0, 0.0, BLACK);
+    Event e0_obs = Event(0.0, 0.0, BLACK);
+    Event e1_obs = Event(0.0, 0.0, BLACK);
+    Event e2_obs = Event(0.0, 0.0, BLACK);
+    Event e3_obs = Event(0.0, 0.0, BLACK);
     Event e0 = Event(0.0, 0.0, BLACK);
     Event e1 = Event(0.0, 0.0, BLACK);
     Event e2 = Event(0.0, 0.0, BLACK);
@@ -130,10 +130,14 @@ int main()
             mousePosition = GetMousePosition();
             for (int i = 0; i < eventsList.size(); i++)
             {
+                // Get event coordinates in the current OBSERVER's frame
+                Event eventObs = LorentzTransform(eventsList[i], observerVelocity);
+
+                // Get the screen coordinates of that event
                 Vector2 eventScreenCoordinates = (Vector2)
                 {
-                    WorldToScreenX(eventsList[i].getX(), globeWidth/2),
-                    WorldToScreenY(eventsList[i].getT(), globeHeight/2)
+                    WorldToScreenX(eventObs.getX(), globeWidth/2),
+                    WorldToScreenY(eventObs.getT(), globeHeight/2)
                 };
 
                 if (CheckCollisionPointCircle(mousePosition, eventScreenCoordinates, EVENT_RADIUS + 10))
@@ -151,9 +155,17 @@ int main()
 
         if (draggingMode)
         {
+            // Get event new coordinates (in the observer's frame)
             mousePosition = GetMousePosition();
-            eventsList[eventDraggedIndex].setX(ScreenToWorldX(mousePosition.x, globeWidth/2));
-            eventsList[eventDraggedIndex].setT(ScreenToWorldY(mousePosition.y, globeHeight/2));
+            float xObs = ScreenToWorldX(mousePosition.x, globeWidth/2);
+            float tObs = ScreenToWorldY(mousePosition.y, globeHeight/2);
+
+            // Transform coordinates back to LAB's frame
+            Event updatedEvent = LorentzTransform(Event(xObs, tObs, BLACK), -observerVelocity);
+
+            // Update event
+            eventsList[eventDraggedIndex].setX(updatedEvent.getX());
+            eventsList[eventDraggedIndex].setT(updatedEvent.getT());
         }
 
         
@@ -192,28 +204,28 @@ int main()
 
             // Draw LAB FRAME's axes on the OBSERVER's FRAME
 
-            // Axe's points coordinates in the lab's frame
+            // Axes points of LAB's frame in the LAB's frame
             e0 = Event(0.0, ScreenToWorldY(MARGIN, globeHeight/2), BLACK);
             e1 = Event(0.0, ScreenToWorldY(MARGIN + globeHeight, globeHeight/2), BLACK);
             e2 = Event(ScreenToWorldX(MARGIN, globeWidth/2), 0.0, BLACK);
             e3 = Event(ScreenToWorldX(MARGIN + globeWidth, globeWidth/2), 0.0, BLACK);
 
-            // Those axe's points coordinates in the observer's frame (the lab moves at -observerVelocity)
-            e_lab_0 = LorentzTransform(e0, observerVelocity);
-            e_lab_1 = LorentzTransform(e1, observerVelocity);
-            e_lab_2 = LorentzTransform(e2, observerVelocity);
-            e_lab_3 = LorentzTransform(e3, observerVelocity);
+            // Those axes' points converted in the OBSERVER's frame
+            e0_obs = LorentzTransform(e0, observerVelocity);
+            e1_obs = LorentzTransform(e1, observerVelocity);
+            e2_obs = LorentzTransform(e2, observerVelocity);
+            e3_obs = LorentzTransform(e3, observerVelocity);
 
             // Drawing axes
             DrawLineEx(
-                (Vector2){WorldToScreenX(e_lab_0.getX(), globeWidth/2), WorldToScreenY(e_lab_0.getT(), globeHeight/2)},
-                (Vector2){WorldToScreenX(e_lab_1.getX(), globeWidth/2), WorldToScreenY(e_lab_1.getT(), globeHeight/2)},
+                (Vector2){WorldToScreenX(e0_obs.getX(), globeWidth/2), WorldToScreenY(e0_obs.getT(), globeHeight/2)},
+                (Vector2){WorldToScreenX(e1_obs.getX(), globeWidth/2), WorldToScreenY(e1_obs.getT(), globeHeight/2)},
                 SECONDARY_GRID_THICKNESS,
                 SECONDARY_GRID_COLOR
             );
             DrawLineEx(
-                (Vector2){WorldToScreenX(e_lab_2.getX(), globeWidth/2), WorldToScreenY(e_lab_2.getT(), globeHeight/2)},
-                (Vector2){WorldToScreenX(e_lab_3.getX(), globeWidth/2), WorldToScreenY(e_lab_3.getT(), globeHeight/2)},
+                (Vector2){WorldToScreenX(e2_obs.getX(), globeWidth/2), WorldToScreenY(e2_obs.getT(), globeHeight/2)},
+                (Vector2){WorldToScreenX(e3_obs.getX(), globeWidth/2), WorldToScreenY(e3_obs.getT(), globeHeight/2)},
                 SECONDARY_GRID_THICKNESS,
                 SECONDARY_GRID_COLOR
             );
