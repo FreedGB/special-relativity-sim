@@ -4,21 +4,36 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
-
 // Global constants
-#define MARGIN 30.0
+#define MARGIN 30.0f
+#define BORDER_THICKNESS 2.0f
+#define AXE_THICKNESS 2.0f
+#define GRID_THICKNESS 1.0f
+#define SECONDARY_GRID_THICKNESS 1.0f
+#define GRID_SPACING 50.0f
+#define C 1.0f
+#define EVENT_RADIUS 10.0f
+#define EVENT_BUTTON_HEIGHT 30.0f
+#define EVENT_BUTTON_WIDTH 70.0f
+#define TEXT_FONT_SIZE 10.0f
+
+// Colors
+// (Color){0xcd, 0xef, 0xf7, 0xff} bluish
+#define BACKGROUND_COLOR RAYWHITE
 #define GRID_COLOR BLACK
 #define TEXT_COLOR BLACK
 #define SECONDARY_GRID_COLOR GRAY
-#define BORDER_THICKNESS 2.0
-#define AXE_THICKNESS 2.0
-#define GRID_THICKNESS 1.0
-#define SECONDARY_GRID_THICKNESS 1.0
-#define GRID_SPACING 50
-#define C 1.0
-#define EVENT_RADIUS 10.0
-#define EVENT_BUTTON_HEIGHT 60
-#define EVENT_BUTTON_WIDTH 30
+#define MAIN_RED RED
+#define SECONDARY_RED (Color){0xe6, 0x29, 0x37, 0xb8}
+#define MAIN_BLUE BLUE
+#define SECONDARY_BLUE (Color){0x00, 0x79, 0xf1, 0x80}
+#define MAIN_GREEN GREEN
+#define SECONDARY_GREEN (Color){0x00, 0xe4, 0x30, 0x80}
+
+// GUI constants
+#define ELEMENT_SPACING 40.0f
+#define TITLE_BOTTOM_MARGIN 30.0f
+#define PANEL_BLOCKS_SPACING 60.0f
 
 
 // Class
@@ -53,6 +68,7 @@ class Event
 
 
 // Custom Functions
+float GetGamma(float observerVelocity);
 Event LorentzTransform(Event point, float observerVelocity);
 float WorldToScreenX(float worldX, int offsetX);
 float WorldToScreenY(float worldY, int offsetY);
@@ -80,6 +96,7 @@ int main()
     Vector2 mousePosition;
     int eventDraggedIndex;
     int activeToggle = -1;
+    int activeDropdown = 0;
 
     // Define and initialize generic limit points
     Event e0_obs = Event(0.0, 0.0, BLACK);
@@ -100,20 +117,14 @@ int main()
     Event p_obs_3 = Event(0.0, 0.0, BLACK);
     Event p_obs_4 = Event(0.0, 0.0, BLACK);
 
-    // Colors
-    const Color MAIN_RED = RED;
-    const Color SECONDARY_RED = (Color){0xe6, 0x29, 0x37, 0xb8};
-    const Color MAIN_BLUE = BLUE;
-    const Color SECONDARY_BLUE = (Color){0x00, 0x79, 0xf1, 0x80};
-    const Color MAIN_GREEN = GREEN;
-    const Color SECONDARY_GREEN = (Color){0x00, 0xe4, 0x30, 0x80};
-
     // Define event color list. Each element is a couple (color in adding mode, main color)
     std::vector<std::vector<Color>> eventColorList = {
         {MAIN_RED, SECONDARY_RED},
         {MAIN_BLUE, SECONDARY_BLUE},
         {MAIN_GREEN, SECONDARY_GREEN}
     };
+
+    GuiSetStyle(DEFAULT, TEXT_SIZE, TEXT_FONT_SIZE);
 
     // Game loop
     while (!WindowShouldClose())
@@ -170,11 +181,11 @@ int main()
 
         
         BeginDrawing();
-            ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+            ClearBackground(BACKGROUND_COLOR);
 
             // Draw windows
             DrawRectangleLinesEx((Rectangle){MARGIN, MARGIN, globeWidth, globeHeight}, BORDER_THICKNESS, GRID_COLOR);
-            GuiPanel((Rectangle){globeWidth + 2*MARGIN, MARGIN, panelWidth, panelHeight}, "Control panel");
+            GuiPanel((Rectangle){globeWidth + 2.0f*MARGIN, MARGIN, panelWidth, panelHeight}, "Control panel");
 
             
             // --- Spacetime Globe ---
@@ -184,23 +195,9 @@ int main()
             */
 
             // Draw labels
-            DrawText("space", MARGIN + globeWidth - 70, MARGIN + globeHeight/2 + 10, 20, TEXT_COLOR);
-            DrawText("time", MARGIN + globeWidth/2 + 10, MARGIN + 10, 20, TEXT_COLOR);
+            DrawText("space", MARGIN + globeWidth - 70, MARGIN + globeHeight/2 + 10, TEXT_FONT_SIZE, TEXT_COLOR);
+            DrawText("time", MARGIN + globeWidth/2 + 10, MARGIN + 10, TEXT_FONT_SIZE, TEXT_COLOR);
             
-            
-            // Draw OBSERVER FRAME's axes
-            DrawLineEx(
-                (Vector2){MARGIN + globeWidth/2, MARGIN},
-                (Vector2){MARGIN + globeWidth/2, MARGIN + globeHeight},
-                AXE_THICKNESS,
-                GRID_COLOR
-            );
-            DrawLineEx(
-                (Vector2){MARGIN, MARGIN + globeHeight/2},
-                (Vector2){MARGIN + globeWidth, MARGIN + globeHeight/2},
-                AXE_THICKNESS,
-                GRID_COLOR
-            );
 
             // Draw LAB FRAME's axes on the OBSERVER's FRAME
 
@@ -228,6 +225,20 @@ int main()
                 (Vector2){WorldToScreenX(e3_obs.getX(), globeWidth/2), WorldToScreenY(e3_obs.getT(), globeHeight/2)},
                 SECONDARY_GRID_THICKNESS,
                 SECONDARY_GRID_COLOR
+            );
+
+            // Draw OBSERVER FRAME's axes
+            DrawLineEx(
+                (Vector2){MARGIN + globeWidth/2, MARGIN},
+                (Vector2){MARGIN + globeWidth/2, MARGIN + globeHeight},
+                AXE_THICKNESS,
+                GRID_COLOR
+            );
+            DrawLineEx(
+                (Vector2){MARGIN, MARGIN + globeHeight/2},
+                (Vector2){MARGIN + globeWidth, MARGIN + globeHeight/2},
+                AXE_THICKNESS,
+                GRID_COLOR
             );
 
 
@@ -327,22 +338,34 @@ int main()
 
 
             // --- Control panel ---
+            float left_margin = globeWidth + 2*MARGIN + 15;
+            currentY = MARGIN + 40;
 
-            // Velocity slider
-            currentX = globeWidth + 2*MARGIN + 30;
-            currentY = MARGIN + 60;
-            // GuiLabel((Rectangle){globeWidth + 2*MARGIN + 30, MARGIN + 40, panelWidth - 30, 20}, "Velocity slider");
-            GuiSlider((Rectangle){currentX, currentY, panelWidth - 200, 20}, "-C", "C", &observerVelocity, -1.0*C, 1.0*C);
-            currentX += panelWidth - 150;
-            DrawText(TextFormat("v = %.2f c", observerVelocity), currentX, currentY, 20, TEXT_COLOR);
+            // Observer frame info
+            currentX = left_margin;
+            GuiLine((Rectangle){currentX, currentY, panelWidth - 50, 10}, "Observer frame info");
 
-            // Event adding buttons
+            currentY += TITLE_BOTTOM_MARGIN;
+            currentX += 26;
+            GuiSlider((Rectangle){currentX, currentY, panelWidth - 100, 15}, "-c", "c", &observerVelocity, -1.0f*C, 1.0f*C);
+
+            currentX -= 20;
+            currentY += ELEMENT_SPACING;
+            DrawText(TextFormat("Observer velocity = %.2f c", observerVelocity), currentX, currentY - 2, TEXT_FONT_SIZE, TEXT_COLOR);
+
+            currentY += 20;
+            DrawText(TextFormat("Gamma = %.2f", GetGamma(observerVelocity)), currentX, currentY - 2, TEXT_FONT_SIZE, TEXT_COLOR);
+
+            
+            // Event adding
+            currentX = left_margin;
+            currentY += PANEL_BLOCKS_SPACING;
+
+            GuiLine((Rectangle){currentX, currentY, panelWidth - 50, 10}, "Add an event");
+            currentY += TITLE_BOTTOM_MARGIN;
+
             addingMode = false;
-
-            currentX = globeWidth + 2*MARGIN + 30;
-            currentY += 50;
-
-            GuiToggleGroup((Rectangle){currentX, currentY, 60, 30}, "RED;BLUE;GREEN", &activeToggle);
+            GuiToggleGroup((Rectangle){currentX, currentY, EVENT_BUTTON_WIDTH, EVENT_BUTTON_HEIGHT}, "Red;Blue;Green", &activeToggle);
             if (activeToggle > -1)
             {
                 addingMode = true;
@@ -351,16 +374,33 @@ int main()
 
 
             // Clear button
-            currentX = globeWidth + 2*MARGIN + 30 + panelWidth - 120;
+            currentX = left_margin;
             currentY += 50;
-            if (GuiButton((Rectangle){currentX, currentY, 60, 30}, "Clear all"))
+            if (GuiButton((Rectangle){currentX, currentY, 100, 30}, "Clear all"))
             {
                 eventsList.clear();
             }
-            
 
+
+            // Custom scenario
+            currentX = left_margin;
+            currentY += PANEL_BLOCKS_SPACING;
+
+            GuiLine((Rectangle){currentX, currentY, panelWidth - 50, 10}, "Scenario");
+            currentY += TITLE_BOTTOM_MARGIN;
+            
+            GuiDropdownBox((Rectangle){currentX, currentY, panelWidth - 100, 40}, "Custom scenario;Time dilation;Length contraction", &activeDropdown, false);
+            
+            // Modes
+            if (draggingMode)
+            {
+                GuiStatusBar((Rectangle){ 24, 24, 160, 40 }, "#191#Dragging mode");
+            }
+            
             if (addingMode)
             {
+                GuiStatusBar((Rectangle){ 24, 24, 160, 40 }, "#191#Adding mode");
+                
                 mousePosition = GetMousePosition();
                 if (MouseInGrid(mousePosition, globeWidth, globeHeight))
                 {
@@ -400,9 +440,14 @@ int main()
 }
 
 
+float GetGamma(float observerVelocity)
+{
+    return 1 / (sqrt(1.0f - pow(observerVelocity/C, 2)));
+}
+
 Event LorentzTransform(Event point, float observerVelocity)
 {
-    float gamma = 1 / (sqrt(1.0f - pow(observerVelocity/C, 2)));
+    float gamma = GetGamma(observerVelocity);
     float x_prime = gamma * (point.getX() - observerVelocity * point.getT());
     float t_prime = gamma * (point.getT() - (observerVelocity * point.getX() / pow(C, 2)));
     
