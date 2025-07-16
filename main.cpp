@@ -4,6 +4,8 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
+#include "style_rltech.h"
+
 // Global constants
 #define MARGIN 30.0f
 #define BORDER_THICKNESS 2.0f
@@ -15,7 +17,7 @@
 #define EVENT_RADIUS 10.0f
 #define EVENT_BUTTON_HEIGHT 30.0f
 #define EVENT_BUTTON_WIDTH 70.0f
-#define TEXT_FONT_SIZE 10.0f
+#define TEXT_FONT_SIZE 16.0f
 
 // Colors
 // (Color){0xcd, 0xef, 0xf7, 0xff} bluish
@@ -34,6 +36,7 @@
 #define ELEMENT_SPACING 40.0f
 #define TITLE_BOTTOM_MARGIN 30.0f
 #define PANEL_BLOCKS_SPACING 60.0f
+#define LETTER_SPACING 2.0f
 
 
 // Class
@@ -81,12 +84,16 @@ int main()
     // Game definitions
     InitWindow(1000, 500, "SPACETIME GLOBE SIMULATION");
     SetTargetFPS(60);
+    Font font = LoadFont("rltech.ttf");
+    GuiLoadStyleRLTech();
+    GuiSetFont(font);
+    GuiSetStyle(DEFAULT, TEXT_SIZE, TEXT_FONT_SIZE);
 
     float globeWidth;
     float globeHeight;
     float panelWidth;
     float panelHeight;
-    float observerVelocity;
+    float observerVelocity = 0.0f;
     float currentX;
     float currentY;
     std::vector<Event> eventsList;
@@ -123,8 +130,6 @@ int main()
         {MAIN_BLUE, SECONDARY_BLUE},
         {MAIN_GREEN, SECONDARY_GREEN}
     };
-
-    GuiSetStyle(DEFAULT, TEXT_SIZE, TEXT_FONT_SIZE);
 
     // Game loop
     while (!WindowShouldClose())
@@ -185,7 +190,7 @@ int main()
 
             // Draw windows
             DrawRectangleLinesEx((Rectangle){MARGIN, MARGIN, globeWidth, globeHeight}, BORDER_THICKNESS, GRID_COLOR);
-            GuiPanel((Rectangle){globeWidth + 2.0f*MARGIN, MARGIN, panelWidth, panelHeight}, "Control panel");
+            GuiPanel((Rectangle){globeWidth + 2.0f*MARGIN, MARGIN, panelWidth, panelHeight}, "#142#Control panel");
 
             
             // --- Spacetime Globe ---
@@ -195,8 +200,10 @@ int main()
             */
 
             // Draw labels
-            DrawText("space", MARGIN + globeWidth - 70, MARGIN + globeHeight/2 + 10, TEXT_FONT_SIZE, TEXT_COLOR);
-            DrawText("time", MARGIN + globeWidth/2 + 10, MARGIN + 10, TEXT_FONT_SIZE, TEXT_COLOR);
+            DrawTextEx(font, "space", (Vector2){MARGIN + globeWidth - 70, MARGIN + globeHeight/2 + 10}, TEXT_FONT_SIZE, 2, TEXT_COLOR);
+            // DrawText("space", MARGIN + globeWidth - 70, MARGIN + globeHeight/2 + 10, TEXT_FONT_SIZE, TEXT_COLOR);
+            // DrawText("time", MARGIN + globeWidth/2 + 10, MARGIN + 10, TEXT_FONT_SIZE, TEXT_COLOR);
+            DrawTextEx(font, "time", (Vector2){MARGIN + globeHeight/2 + 10, MARGIN + 10}, TEXT_FONT_SIZE, 2, TEXT_COLOR);
             
 
             // Draw LAB FRAME's axes on the OBSERVER's FRAME
@@ -351,10 +358,10 @@ int main()
 
             currentX -= 20;
             currentY += ELEMENT_SPACING;
-            DrawText(TextFormat("Observer velocity = %.2f c", observerVelocity), currentX, currentY - 2, TEXT_FONT_SIZE, TEXT_COLOR);
+            DrawTextEx(font, TextFormat("Observer velocity = %.2f c", observerVelocity), (Vector2){currentX, currentY - 2}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
 
             currentY += 20;
-            DrawText(TextFormat("Gamma = %.2f", GetGamma(observerVelocity)), currentX, currentY - 2, TEXT_FONT_SIZE, TEXT_COLOR);
+            DrawTextEx(font, TextFormat("Gamma = %.2f", GetGamma(observerVelocity)), (Vector2){currentX, currentY - 2}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
 
             
             // Event adding
