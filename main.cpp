@@ -406,24 +406,30 @@ int main()
             
             if (addingMode)
             {
-                GuiStatusBar((Rectangle){ 24, 24, 160, 40 }, "#191#Adding mode");
-                
-                mousePosition = GetMousePosition();
-                if (MouseInGrid(mousePosition, globeWidth, globeHeight))
+                GuiStatusBar((Rectangle){ 24, 24, 260, 40 }, "#191#Adding mode [SPACE to cancel]");
+                if (IsKeyPressed(KEY_SPACE))
                 {
-                    DrawCircleV(GetMousePosition(), EVENT_RADIUS, eventColorList[colorIndex][1]);
-                    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+                    activeToggle = -1;
+                }
+                else
+                {
+                    mousePosition = GetMousePosition();
+                    if (MouseInGrid(mousePosition, globeWidth, globeHeight))
                     {
-                        Event e = LorentzTransform(Event(ScreenToWorldX(mousePosition.x, globeWidth/2), ScreenToWorldY(mousePosition.y, globeHeight/2), BLACK), -observerVelocity);
-                        
-                        eventsList.push_back(
-                            Event(
-                                e.getX(),
-                                e.getT(),
-                                eventColorList[colorIndex][0]
-                            )
-                        );
-                        activeToggle = -1;
+                        DrawCircleV(GetMousePosition(), EVENT_RADIUS, eventColorList[colorIndex][1]);
+                        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+                        {
+                            Event e = LorentzTransform(Event(ScreenToWorldX(mousePosition.x, globeWidth/2), ScreenToWorldY(mousePosition.y, globeHeight/2), BLACK), -observerVelocity);
+                            
+                            eventsList.push_back(
+                                Event(
+                                    e.getX(),
+                                    e.getT(),
+                                    eventColorList[colorIndex][0]
+                                )
+                            );
+                            activeToggle = -1;
+                        }
                     }
                 }
             }
