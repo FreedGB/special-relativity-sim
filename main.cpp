@@ -104,6 +104,7 @@ int main()
     int eventDraggedIndex;
     int activeToggle = -1;
     int activeDropdown = 0;
+    bool activeCheckBox = false;
 
     // Define and initialize generic limit points
     Event e0_obs = Event(0.0, 0.0, BLACK);
@@ -362,7 +363,25 @@ int main()
 
             currentY += 20;
             DrawTextEx(font, TextFormat("Gamma = %.2f", GetGamma(observerVelocity)), (Vector2){currentX, currentY - 2}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
-
+            
+            // Seeing coordinates checkbox
+            currentY += 20;
+            GuiCheckBox((Rectangle){currentX, currentY, TEXT_FONT_SIZE, TEXT_FONT_SIZE}, "See coordinates", &activeCheckBox);
+            if (activeCheckBox)
+            {
+                mousePosition = GetMousePosition();
+                if (MouseInGrid(mousePosition, globeWidth, globeHeight))
+                {
+                    DrawTextEx(
+                        font,
+                        TextFormat("(%.2f, %.2f)", ScreenToWorldX(mousePosition.x, globeWidth/2), ScreenToWorldY(mousePosition.y, globeHeight/2)),
+                        (Vector2){mousePosition.x + 5, mousePosition.y - 20},
+                        TEXT_FONT_SIZE,
+                        LETTER_SPACING,
+                        TEXT_COLOR
+                    );
+                }
+            }
             
             // Event adding
             currentX = left_margin;
