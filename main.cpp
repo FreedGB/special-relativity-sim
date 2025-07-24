@@ -70,41 +70,41 @@ class Event
             this->color = color;
         }
 
-        void setX(float x) { this->x = x; }
-        void setT(float t) { this->t = t; }
-        float getX() { return this->x; }
-        float getT() { return this->t; }
-        Color getColor() { return this->color; }
+        void set_x(float x) { this->x = x; }
+        void set_t(float t) { this->t = t; }
+        float get_x() { return this->x; }
+        float get_t() { return this->t; }
+        Color get_color() { return this->color; }
 };
 
 // Rod class
 class Rod
 {
-    Event tipEvent;
-    Event tailEvent;
+    Event tip_event;
+    Event tail_event;
     Color color;
 
     public:
-        Rod(Event tipEvent, Event tailEvent, Color color)
+        Rod(Event tip_event, Event tail_event, Color color)
         {
-            this->tipEvent = tipEvent;
-            this->tailEvent = tailEvent;
+            this->tip_event = tip_event;
+            this->tail_event = tail_event;
             this->color = color;
         }
 
-        Event getTipEvent() {return this->tipEvent;}
-        Event getTailEvent() {return this->tailEvent;}
-        Color getColor() {return this->color;}
+        Event get_tip_event() {return this->tip_event;}
+        Event get_tail_event() {return this->tail_event;}
+        Color get_color() {return this->color;}
 };
 
 // Custom Functions
-float GetGamma(float observerVelocity);
-Event LorentzTransform(Event point, float observerVelocity);
-float WorldToScreenX(float worldX, int offsetX);
-float WorldToScreenY(float worldY, int offsetY);
-float ScreenToWorldX(float screenX, int offsetX);
-float ScreenToWorldY(float screenY, int offsetY);
-bool MouseInGrid(Vector2 mouse, float gridWidth, float gridHeight);
+float get_gamma(float observer_velocity);
+Event lorentz_transform(Event point, float observer_velocity);
+float world_to_screen_x(float world_x, int offset_x);
+float world_to_screen_y(float world_y, int offset_y);
+float screen_to_world_x(float screen_x, int offset_x);
+float screen_to_world_y(float screen_y, int offset_y);
+bool mouse_in_grid(Vector2 mouse, float globe_width, float globe_height);
 
 int main()
 {
@@ -116,29 +116,29 @@ int main()
     GuiSetFont(font);
     GuiSetStyle(DEFAULT, TEXT_SIZE, TEXT_FONT_SIZE);
 
-    float globeWidth;
-    float globeHeight;
-    float panelWidth;
-    float panelHeight;
-    float observerVelocity = 0.0f;
-    float currentX;
-    float currentY;
-    std::vector<Event> eventsList; // Stores the events coordinates in the LAB's frame
-    std::vector<Rod> rodsList;
-    bool draggingMode;
-    bool addingEventMode;
-    bool addingRodModeStep1 = false;
-    bool addingRodModeStep2 = false;
-    int colorIndex;
-    Vector2 mousePosition;
-    int eventDraggedIndex;
-    int activeEventToggle = -1;
-    int activeRodToggle = -1;
-    bool activeCheckBox = false;
-    Vector2 tipPosition;
-    Vector2 tailPosition;
-    Event tipEvent;
-    Event tailEvent;
+    float globe_width;
+    float globe_height;
+    float panel_width;
+    float panel_height;
+    float observer_velocity = 0.0f;
+    float current_x;
+    float current_y;
+    std::vector<Event> events_list; // Stores the events coordinates in the LAB's frame
+    std::vector<Rod> rods_list;
+    bool dragging_mode;
+    bool adding_event_mode;
+    bool adding_rod_mode_step_1 = false;
+    bool adding_rod_mode_step_2 = false;
+    int color_index;
+    Vector2 mouse_position;
+    int event_dragged_index;
+    int active_event_toggle = -1;
+    int active_rod_toggle = -1;
+    bool active_checkbox = false;
+    Vector2 tip_position;
+    Vector2 tail_position;
+    Event tip_event;
+    Event tail_event;
 
     // Define and initialize generic limit points
     Event e0_obs;
@@ -160,7 +160,7 @@ int main()
     Event p_obs_4;
 
     // Define event color list. Each element is a couple (color in adding mode, main color)
-    std::vector<std::vector<Color>> eventColorList = {
+    std::vector<std::vector<Color>> colors_list = {
         {MAIN_RED, SECONDARY_RED},
         {MAIN_BLUE, SECONDARY_BLUE},
         {MAIN_GREEN, SECONDARY_GREEN}
@@ -169,18 +169,18 @@ int main()
     // Game loop
     while (!WindowShouldClose())
     {   
-        globeWidth = (2 * GetScreenWidth())/3 - 2 * MARGIN;
-        globeHeight = GetScreenHeight() - 3 * MARGIN;
-        panelWidth = GetScreenWidth()/3 - MARGIN;
-        panelHeight = globeHeight;
+        globe_width = (2 * GetScreenWidth())/3 - 2 * MARGIN;
+        globe_height = GetScreenHeight() - 3 * MARGIN;
+        panel_width = GetScreenWidth()/3 - MARGIN;
+        panel_height = globe_height;
 
         
         BeginDrawing();
             ClearBackground(BACKGROUND_COLOR);
 
             // Draw windows
-            DrawRectangleLinesEx((Rectangle){MARGIN, MARGIN, globeWidth, globeHeight}, BORDER_THICKNESS, GRID_COLOR);
-            GuiPanel((Rectangle){globeWidth + 2.0f*MARGIN, MARGIN, panelWidth, panelHeight}, "#142#Control panel");
+            DrawRectangleLinesEx((Rectangle){MARGIN, MARGIN, globe_width, globe_height}, BORDER_THICKNESS, GRID_COLOR);
+            GuiPanel((Rectangle){globe_width + 2.0f*MARGIN, MARGIN, panel_width, panel_height}, "#142#Control panel");
 
             
             // --- Spacetime Globe ---
@@ -190,79 +190,79 @@ int main()
             */
 
             // Draw labels
-            DrawTextEx(font, "space", (Vector2){MARGIN + globeWidth - 70, MARGIN + globeHeight/2 + 10}, TEXT_FONT_SIZE, 2, TEXT_COLOR);
-            DrawTextEx(font, "time", (Vector2){MARGIN + globeHeight/2 + 10, MARGIN + 10}, TEXT_FONT_SIZE, 2, TEXT_COLOR);
+            DrawTextEx(font, "space", (Vector2){MARGIN + globe_width - 70, MARGIN + globe_height/2 + 10}, TEXT_FONT_SIZE, 2, TEXT_COLOR);
+            DrawTextEx(font, "time", (Vector2){MARGIN + globe_height/2 + 10, MARGIN + 10}, TEXT_FONT_SIZE, 2, TEXT_COLOR);
             
 
             // Draw LAB FRAME's axes on the OBSERVER's FRAME
 
             // Axes points of LAB's frame in the LAB's frame
-            e0 = Event(0.0, ScreenToWorldY(MARGIN, globeHeight/2), BLACK);
-            e1 = Event(0.0, ScreenToWorldY(MARGIN + globeHeight, globeHeight/2), BLACK);
-            e2 = Event(ScreenToWorldX(MARGIN, globeWidth/2), 0.0, BLACK);
-            e3 = Event(ScreenToWorldX(MARGIN + globeWidth, globeWidth/2), 0.0, BLACK);
+            e0 = Event(0.0, screen_to_world_y(MARGIN, globe_height/2), BLACK);
+            e1 = Event(0.0, screen_to_world_y(MARGIN + globe_height, globe_height/2), BLACK);
+            e2 = Event(screen_to_world_x(MARGIN, globe_width/2), 0.0, BLACK);
+            e3 = Event(screen_to_world_x(MARGIN + globe_width, globe_width/2), 0.0, BLACK);
 
             // Those axes' points converted in the OBSERVER's frame
-            e0_obs = LorentzTransform(e0, observerVelocity);
-            e1_obs = LorentzTransform(e1, observerVelocity);
-            e2_obs = LorentzTransform(e2, observerVelocity);
-            e3_obs = LorentzTransform(e3, observerVelocity);
+            e0_obs = lorentz_transform(e0, observer_velocity);
+            e1_obs = lorentz_transform(e1, observer_velocity);
+            e2_obs = lorentz_transform(e2, observer_velocity);
+            e3_obs = lorentz_transform(e3, observer_velocity);
 
             // Drawing axes
             DrawLineEx(
-                (Vector2){WorldToScreenX(e0_obs.getX(), globeWidth/2), WorldToScreenY(e0_obs.getT(), globeHeight/2)},
-                (Vector2){WorldToScreenX(e1_obs.getX(), globeWidth/2), WorldToScreenY(e1_obs.getT(), globeHeight/2)},
+                (Vector2){world_to_screen_x(e0_obs.get_x(), globe_width/2), world_to_screen_y(e0_obs.get_t(), globe_height/2)},
+                (Vector2){world_to_screen_x(e1_obs.get_x(), globe_width/2), world_to_screen_y(e1_obs.get_t(), globe_height/2)},
                 SECONDARY_GRID_THICKNESS,
                 SECONDARY_GRID_COLOR
             );
             DrawLineEx(
-                (Vector2){WorldToScreenX(e2_obs.getX(), globeWidth/2), WorldToScreenY(e2_obs.getT(), globeHeight/2)},
-                (Vector2){WorldToScreenX(e3_obs.getX(), globeWidth/2), WorldToScreenY(e3_obs.getT(), globeHeight/2)},
+                (Vector2){world_to_screen_x(e2_obs.get_x(), globe_width/2), world_to_screen_y(e2_obs.get_t(), globe_height/2)},
+                (Vector2){world_to_screen_x(e3_obs.get_x(), globe_width/2), world_to_screen_y(e3_obs.get_t(), globe_height/2)},
                 SECONDARY_GRID_THICKNESS,
                 SECONDARY_GRID_COLOR
             );
 
             // Draw OBSERVER FRAME's axes
             DrawLineEx(
-                (Vector2){MARGIN + globeWidth/2, MARGIN},
-                (Vector2){MARGIN + globeWidth/2, MARGIN + globeHeight},
+                (Vector2){MARGIN + globe_width/2, MARGIN},
+                (Vector2){MARGIN + globe_width/2, MARGIN + globe_height},
                 AXE_THICKNESS,
                 GRID_COLOR
             );
             DrawLineEx(
-                (Vector2){MARGIN, MARGIN + globeHeight/2},
-                (Vector2){MARGIN + globeWidth, MARGIN + globeHeight/2},
+                (Vector2){MARGIN, MARGIN + globe_height/2},
+                (Vector2){MARGIN + globe_width, MARGIN + globe_height/2},
                 AXE_THICKNESS,
                 GRID_COLOR
             );
 
 
             // Drawing frames' vertical lines
-            int s = globeWidth / GRID_SPACING;
+            int s = globe_width / GRID_SPACING;
             for (int i = 1; i <= s/2; i++)
             {   
                 // Vertical lines of the OBSERVER's frame (they coincide with LAB's frame at v = 0)
-                p_obs_1 = Event(-i, ScreenToWorldY(MARGIN, globeHeight/2), BLACK);
-                p_obs_2 = Event(-i, ScreenToWorldY(MARGIN + globeHeight, globeHeight/2), BLACK);
-                p_obs_3 = Event(i, ScreenToWorldY(MARGIN, globeHeight/2), BLACK);
-                p_obs_4 = Event(i, ScreenToWorldY(MARGIN + globeHeight, globeHeight/2), BLACK);
+                p_obs_1 = Event(-i, screen_to_world_y(MARGIN, globe_height/2), BLACK);
+                p_obs_2 = Event(-i, screen_to_world_y(MARGIN + globe_height, globe_height/2), BLACK);
+                p_obs_3 = Event(i, screen_to_world_y(MARGIN, globe_height/2), BLACK);
+                p_obs_4 = Event(i, screen_to_world_y(MARGIN + globe_height, globe_height/2), BLACK);
                 
                 // Vertical lines of the LAB's frame viewed in the OBSERVER's frame
-                p_lab_1 = LorentzTransform(p_obs_1, observerVelocity);
-                p_lab_2 = LorentzTransform(p_obs_2, observerVelocity);
-                p_lab_3 = LorentzTransform(p_obs_3, observerVelocity);
-                p_lab_4 = LorentzTransform(p_obs_4, observerVelocity);
+                p_lab_1 = lorentz_transform(p_obs_1, observer_velocity);
+                p_lab_2 = lorentz_transform(p_obs_2, observer_velocity);
+                p_lab_3 = lorentz_transform(p_obs_3, observer_velocity);
+                p_lab_4 = lorentz_transform(p_obs_4, observer_velocity);
 
                 // Drawing LAB's frame vertical lines
                 DrawLineEx(
-                    (Vector2){WorldToScreenX(p_lab_1.getX(), globeWidth/2), WorldToScreenY(p_lab_1.getT(), globeHeight/2)},
-                    (Vector2){WorldToScreenX(p_lab_2.getX(), globeWidth/2), WorldToScreenY(p_lab_2.getT(), globeHeight/2)},
+                    (Vector2){world_to_screen_x(p_lab_1.get_x(), globe_width/2), world_to_screen_y(p_lab_1.get_t(), globe_height/2)},
+                    (Vector2){world_to_screen_x(p_lab_2.get_x(), globe_width/2), world_to_screen_y(p_lab_2.get_t(), globe_height/2)},
                     SECONDARY_GRID_THICKNESS,
                     SECONDARY_GRID_COLOR
                 );
                 DrawLineEx(
-                    (Vector2){WorldToScreenX(p_lab_3.getX(), globeWidth/2), WorldToScreenY(p_lab_3.getT(), globeHeight/2)},
-                    (Vector2){WorldToScreenX(p_lab_4.getX(), globeWidth/2), WorldToScreenY(p_lab_4.getT(), globeHeight/2)},
+                    (Vector2){world_to_screen_x(p_lab_3.get_x(), globe_width/2), world_to_screen_y(p_lab_3.get_t(), globe_height/2)},
+                    (Vector2){world_to_screen_x(p_lab_4.get_x(), globe_width/2), world_to_screen_y(p_lab_4.get_t(), globe_height/2)},
                     SECONDARY_GRID_THICKNESS,
                     SECONDARY_GRID_COLOR
                 );
@@ -270,14 +270,14 @@ int main()
 
                 // Drawing OBSERVER's frame vertical lines
                 DrawLineEx(
-                    (Vector2){WorldToScreenX(p_obs_1.getX(), globeWidth/2), WorldToScreenY(p_obs_1.getT(), globeHeight/2)},
-                    (Vector2){WorldToScreenX(p_obs_2.getX(), globeWidth/2), WorldToScreenY(p_obs_2.getT(), globeHeight/2)},
+                    (Vector2){world_to_screen_x(p_obs_1.get_x(), globe_width/2), world_to_screen_y(p_obs_1.get_t(), globe_height/2)},
+                    (Vector2){world_to_screen_x(p_obs_2.get_x(), globe_width/2), world_to_screen_y(p_obs_2.get_t(), globe_height/2)},
                     GRID_THICKNESS,
                     GRID_COLOR
                 );
                 DrawLineEx(
-                    (Vector2){WorldToScreenX(p_obs_3.getX(), globeWidth/2), WorldToScreenY(p_obs_3.getT(), globeHeight/2)},
-                    (Vector2){WorldToScreenX(p_obs_4.getX(), globeWidth/2), WorldToScreenY(p_obs_4.getT(), globeHeight/2)},
+                    (Vector2){world_to_screen_x(p_obs_3.get_x(), globe_width/2), world_to_screen_y(p_obs_3.get_t(), globe_height/2)},
+                    (Vector2){world_to_screen_x(p_obs_4.get_x(), globe_width/2), world_to_screen_y(p_obs_4.get_t(), globe_height/2)},
                     GRID_THICKNESS,
                     GRID_COLOR
                 );
@@ -286,31 +286,31 @@ int main()
 
             
             // Drawing frames' horizontal lines
-            int t = globeHeight / GRID_SPACING;
+            int t = globe_height / GRID_SPACING;
             for (int i = 1; i <= t/2; i++)
             {
                 // Horizontal lines of the OBSERVER's frame (they coincide with LAB's frame at v = 0)
-                p_obs_1 = Event(ScreenToWorldX(MARGIN, globeWidth/2), -i, BLACK);
-                p_obs_2 = Event(ScreenToWorldX(MARGIN + globeWidth, globeWidth/2), -i, BLACK);
-                p_obs_3 = Event(ScreenToWorldX(MARGIN, globeWidth/2), i, BLACK);
-                p_obs_4 = Event(ScreenToWorldX(MARGIN + globeWidth, globeWidth/2), i, BLACK);
+                p_obs_1 = Event(screen_to_world_x(MARGIN, globe_width/2), -i, BLACK);
+                p_obs_2 = Event(screen_to_world_x(MARGIN + globe_width, globe_width/2), -i, BLACK);
+                p_obs_3 = Event(screen_to_world_x(MARGIN, globe_width/2), i, BLACK);
+                p_obs_4 = Event(screen_to_world_x(MARGIN + globe_width, globe_width/2), i, BLACK);
 
                 // Horizontal lines of the LAB's frame viewed on the OBSERVER's frame
-                p_lab_1 = LorentzTransform(p_obs_1, observerVelocity);
-                p_lab_2 = LorentzTransform(p_obs_2, observerVelocity);
-                p_lab_3 = LorentzTransform(p_obs_3, observerVelocity);
-                p_lab_4 = LorentzTransform(p_obs_4, observerVelocity);
+                p_lab_1 = lorentz_transform(p_obs_1, observer_velocity);
+                p_lab_2 = lorentz_transform(p_obs_2, observer_velocity);
+                p_lab_3 = lorentz_transform(p_obs_3, observer_velocity);
+                p_lab_4 = lorentz_transform(p_obs_4, observer_velocity);
 
                 // Drawing LAB's frame horizontal lines
                 DrawLineEx(
-                    (Vector2){WorldToScreenX(p_lab_1.getX(), globeWidth/2), WorldToScreenY(p_lab_1.getT(), globeHeight/2)},
-                    (Vector2){WorldToScreenX(p_lab_2.getX(), globeWidth/2), WorldToScreenY(p_lab_2.getT(), globeHeight/2)},
+                    (Vector2){world_to_screen_x(p_lab_1.get_x(), globe_width/2), world_to_screen_y(p_lab_1.get_t(), globe_height/2)},
+                    (Vector2){world_to_screen_x(p_lab_2.get_x(), globe_width/2), world_to_screen_y(p_lab_2.get_t(), globe_height/2)},
                     SECONDARY_GRID_THICKNESS,
                     SECONDARY_GRID_COLOR
                 );
                 DrawLineEx(
-                    (Vector2){WorldToScreenX(p_lab_3.getX(), globeWidth/2), WorldToScreenY(p_lab_3.getT(), globeHeight/2)},
-                    (Vector2){WorldToScreenX(p_lab_4.getX(), globeWidth/2), WorldToScreenY(p_lab_4.getT(), globeHeight/2)},
+                    (Vector2){world_to_screen_x(p_lab_3.get_x(), globe_width/2), world_to_screen_y(p_lab_3.get_t(), globe_height/2)},
+                    (Vector2){world_to_screen_x(p_lab_4.get_x(), globe_width/2), world_to_screen_y(p_lab_4.get_t(), globe_height/2)},
                     SECONDARY_GRID_THICKNESS,
                     SECONDARY_GRID_COLOR
                 );
@@ -318,14 +318,14 @@ int main()
 
                 // Drawing OBSERVER's frame horizontal lines
                 DrawLineEx(
-                    (Vector2){WorldToScreenX(p_obs_1.getX(), globeWidth/2), WorldToScreenY(p_obs_1.getT(), globeHeight/2)},
-                    (Vector2){WorldToScreenX(p_obs_2.getX(), globeWidth/2), WorldToScreenY(p_obs_2.getT(), globeHeight/2)},
+                    (Vector2){world_to_screen_x(p_obs_1.get_x(), globe_width/2), world_to_screen_y(p_obs_1.get_t(), globe_height/2)},
+                    (Vector2){world_to_screen_x(p_obs_2.get_x(), globe_width/2), world_to_screen_y(p_obs_2.get_t(), globe_height/2)},
                     GRID_THICKNESS,
                     GRID_COLOR
                 );
                 DrawLineEx(
-                    (Vector2){WorldToScreenX(p_obs_3.getX(), globeWidth/2), WorldToScreenY(p_obs_3.getT(), globeHeight/2)},
-                    (Vector2){WorldToScreenX(p_obs_4.getX(), globeWidth/2), WorldToScreenY(p_obs_4.getT(), globeHeight/2)},
+                    (Vector2){world_to_screen_x(p_obs_3.get_x(), globe_width/2), world_to_screen_y(p_obs_3.get_t(), globe_height/2)},
+                    (Vector2){world_to_screen_x(p_obs_4.get_x(), globe_width/2), world_to_screen_y(p_obs_4.get_t(), globe_height/2)},
                     GRID_THICKNESS,
                     GRID_COLOR
                 );
@@ -333,36 +333,36 @@ int main()
 
 
             // --- Control panel ---
-            float left_margin = globeWidth + 2*MARGIN + 15;
-            currentY = MARGIN + 40;
+            float left_margin = globe_width + 2*MARGIN + 15;
+            current_y = MARGIN + 40;
 
             // Observer frame info
-            currentX = left_margin;
-            GuiLine((Rectangle){currentX, currentY, panelWidth - 50, 10}, "Observer frame info");
+            current_x = left_margin;
+            GuiLine((Rectangle){current_x, current_y, panel_width - 50, 10}, "Observer frame info");
 
-            currentY += TITLE_BOTTOM_MARGIN;
-            currentX += 26;
-            GuiSlider((Rectangle){currentX, currentY, panelWidth - 100, 15}, "-c", "c", &observerVelocity, -1.0f*C, 1.0f*C);
+            current_y += TITLE_BOTTOM_MARGIN;
+            current_x += 26;
+            GuiSlider((Rectangle){current_x, current_y, panel_width - 100, 15}, "-c", "c", &observer_velocity, -1.0f*C, 1.0f*C);
 
-            currentX -= 20;
-            currentY += ELEMENT_SPACING;
-            DrawTextEx(font, TextFormat("Observer velocity = %.2f c", observerVelocity), (Vector2){currentX, currentY - 2}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
+            current_x -= 20;
+            current_y += ELEMENT_SPACING;
+            DrawTextEx(font, TextFormat("Observer velocity = %.2f c", observer_velocity), (Vector2){current_x, current_y - 2}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
 
-            currentY += 20;
-            DrawTextEx(font, TextFormat("Gamma = %.2f", GetGamma(observerVelocity)), (Vector2){currentX, currentY - 2}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
+            current_y += 20;
+            DrawTextEx(font, TextFormat("Gamma = %.2f", get_gamma(observer_velocity)), (Vector2){current_x, current_y - 2}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
             
             // Seeing coordinates checkbox
-            currentY += 20;
-            GuiCheckBox((Rectangle){currentX, currentY, TEXT_FONT_SIZE, TEXT_FONT_SIZE}, "See coordinates", &activeCheckBox);
-            if (activeCheckBox)
+            current_y += 20;
+            GuiCheckBox((Rectangle){current_x, current_y, TEXT_FONT_SIZE, TEXT_FONT_SIZE}, "See coordinates", &active_checkbox);
+            if (active_checkbox)
             {
-                mousePosition = GetMousePosition();
-                if (MouseInGrid(mousePosition, globeWidth, globeHeight))
+                mouse_position = GetMousePosition();
+                if (mouse_in_grid(mouse_position, globe_width, globe_height))
                 {
                     DrawTextEx(
                         font,
-                        TextFormat("(%.2f, %.2f)", ScreenToWorldX(mousePosition.x, globeWidth/2), ScreenToWorldY(mousePosition.y, globeHeight/2)),
-                        (Vector2){mousePosition.x + 5, mousePosition.y - 20},
+                        TextFormat("(%.2f, %.2f)", screen_to_world_x(mouse_position.x, globe_width/2), screen_to_world_y(mouse_position.y, globe_height/2)),
+                        (Vector2){mouse_position.x + 5, mouse_position.y - 20},
                         TEXT_FONT_SIZE,
                         LETTER_SPACING,
                         TEXT_COLOR
@@ -371,44 +371,44 @@ int main()
             }
             
             // Event adding
-            currentX = left_margin;
-            currentY += PANEL_BLOCKS_SPACING;
+            current_x = left_margin;
+            current_y += PANEL_BLOCKS_SPACING;
 
-            GuiLine((Rectangle){currentX, currentY, panelWidth - 50, 10}, "Add an event");
-            currentY += TITLE_BOTTOM_MARGIN;
+            GuiLine((Rectangle){current_x, current_y, panel_width - 50, 10}, "Add an event");
+            current_y += TITLE_BOTTOM_MARGIN;
 
-            addingEventMode = false;
-            GuiToggleGroup((Rectangle){currentX, currentY, EVENT_BUTTON_WIDTH, EVENT_BUTTON_HEIGHT}, "Red;Blue;Green", &activeEventToggle);
-            if (activeEventToggle > -1)
+            adding_event_mode = false;
+            GuiToggleGroup((Rectangle){current_x, current_y, EVENT_BUTTON_WIDTH, EVENT_BUTTON_HEIGHT}, "Red;Blue;Green", &active_event_toggle);
+            if (active_event_toggle > -1)
             {
-                addingEventMode = true;
-                colorIndex = activeEventToggle;
+                adding_event_mode = true;
+                color_index = active_event_toggle;
             }
 
 
             // Rod adding
-            currentX = left_margin;
-            currentY += PANEL_BLOCKS_SPACING;
+            current_x = left_margin;
+            current_y += PANEL_BLOCKS_SPACING;
 
-            GuiLine((Rectangle){currentX, currentY, panelWidth - 50, 10}, "Add a rod");
-            currentY += TITLE_BOTTOM_MARGIN;
+            GuiLine((Rectangle){current_x, current_y, panel_width - 50, 10}, "Add a rod");
+            current_y += TITLE_BOTTOM_MARGIN;
 
-            GuiToggleGroup((Rectangle){currentX, currentY, EVENT_BUTTON_WIDTH, EVENT_BUTTON_HEIGHT}, "Red;Blue;Green", &activeRodToggle);
-            if (activeRodToggle > -1)
+            GuiToggleGroup((Rectangle){current_x, current_y, EVENT_BUTTON_WIDTH, EVENT_BUTTON_HEIGHT}, "Red;Blue;Green", &active_rod_toggle);
+            if (active_rod_toggle > -1)
             {
-                addingRodModeStep1 = true;
-                addingRodModeStep2 = false;
-                colorIndex = activeRodToggle;
+                adding_rod_mode_step_1 = true;
+                adding_rod_mode_step_2 = false;
+                color_index = active_rod_toggle;
             }
 
             
             // Clear all button
-            currentX = left_margin;
-            currentY += EVENT_BUTTON_HEIGHT + 20;
-            if (GuiButton((Rectangle){currentX, currentY, 200, 30}, "Clear all"))
+            current_x = left_margin;
+            current_y += EVENT_BUTTON_HEIGHT + 20;
+            if (GuiButton((Rectangle){current_x, current_y, 200, 30}, "Clear all"))
             {
-                eventsList.clear();
-                rodsList.clear();
+                events_list.clear();
+                rods_list.clear();
             }
             
 
@@ -417,197 +417,197 @@ int main()
             // TO DO: Make the modes exclusives (one mode at a time)
 
             // Drag and drop
-            draggingMode = false;
+            dragging_mode = false;
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
             {
-                mousePosition = GetMousePosition();
-                for (int i = 0; i < eventsList.size(); i++)
+                mouse_position = GetMousePosition();
+                for (int i = 0; i < events_list.size(); i++)
                 {
                     // Get event coordinates in the current OBSERVER's frame
-                    Event eventObs = LorentzTransform(eventsList[i], observerVelocity);
+                    Event event_obs = lorentz_transform(events_list[i], observer_velocity);
 
                     // Get the screen coordinates of that event
                     Vector2 eventScreenCoordinates = (Vector2)
                     {
-                        WorldToScreenX(eventObs.getX(), globeWidth/2),
-                        WorldToScreenY(eventObs.getT(), globeHeight/2)
+                        world_to_screen_x(event_obs.get_x(), globe_width/2),
+                        world_to_screen_y(event_obs.get_t(), globe_height/2)
                     };
 
-                    if (CheckCollisionPointCircle(mousePosition, eventScreenCoordinates, EVENT_RADIUS + 20))
+                    if (CheckCollisionPointCircle(mouse_position, eventScreenCoordinates, EVENT_RADIUS + 20))
                     {
-                        draggingMode = true;
-                        eventDraggedIndex = i;
+                        dragging_mode = true;
+                        event_dragged_index = i;
                         break;
                     }
                 }
             }
             if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
             {
-                draggingMode = false;
+                dragging_mode = false;
             }
 
-            if (draggingMode)
+            if (dragging_mode)
             {
                 GuiStatusBar((Rectangle){ 24, 24, 160, 40 }, "#191#Dragging mode");
                 
                 // Get event new coordinates (in the observer's frame)
-                mousePosition = GetMousePosition();
-                float xObs = ScreenToWorldX(mousePosition.x, globeWidth/2);
-                float tObs = ScreenToWorldY(mousePosition.y, globeHeight/2);
+                mouse_position = GetMousePosition();
+                float x_obs = screen_to_world_x(mouse_position.x, globe_width/2);
+                float t_obs = screen_to_world_y(mouse_position.y, globe_height/2);
 
                 // Transform coordinates back to LAB's frame
-                Event updatedEvent = LorentzTransform(Event(xObs, tObs, BLACK), -observerVelocity);
+                Event updated_event = lorentz_transform(Event(x_obs, t_obs, BLACK), -observer_velocity);
 
                 // Update event
-                eventsList[eventDraggedIndex].setX(updatedEvent.getX());
-                eventsList[eventDraggedIndex].setT(updatedEvent.getT());
+                events_list[event_dragged_index].set_x(updated_event.get_x());
+                events_list[event_dragged_index].set_t(updated_event.get_t());
             }
 
 
             // Add an event
-            if (addingEventMode)
+            if (adding_event_mode)
             {
                 GuiStatusBar((Rectangle){ 24, 24, 260, 40 }, "#191#Adding an event [SPACE to cancel]");
                 if (IsKeyPressed(KEY_SPACE))
                 {
-                    activeEventToggle = -1;
+                    active_event_toggle = -1;
                 }
                 else
                 {
-                    mousePosition = GetMousePosition();
-                    if (MouseInGrid(mousePosition, globeWidth, globeHeight))
+                    mouse_position = GetMousePosition();
+                    if (mouse_in_grid(mouse_position, globe_width, globe_height))
                     {
                         // Draw shadow event
-                        DrawCircleV(GetMousePosition(), EVENT_RADIUS, eventColorList[colorIndex][1]);
+                        DrawCircleV(GetMousePosition(), EVENT_RADIUS, colors_list[color_index][1]);
 
                         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
                         {
-                            // Get the coordiantes of the event in the LAB's frame. The LAB moves at -observerVelocity relative to the OBSERVER.
-                            Event e = LorentzTransform(Event(ScreenToWorldX(mousePosition.x, globeWidth/2), ScreenToWorldY(mousePosition.y, globeHeight/2), BLACK), -observerVelocity);
+                            // Get the coordiantes of the event in the LAB's frame. The LAB moves at -observer_velocity relative to the OBSERVER.
+                            Event e = lorentz_transform(Event(screen_to_world_x(mouse_position.x, globe_width/2), screen_to_world_y(mouse_position.y, globe_height/2), BLACK), -observer_velocity);
                             
                             // Add the event to event list
-                            eventsList.push_back(
+                            events_list.push_back(
                                 Event(
-                                    e.getX(),
-                                    e.getT(),
-                                    eventColorList[colorIndex][0]
+                                    e.get_x(),
+                                    e.get_t(),
+                                    colors_list[color_index][0]
                                 )
                             );
-                            activeEventToggle = -1;
+                            active_event_toggle = -1;
                         }
                     }
                 }
             }
 
             // Add a rod
-            if (addingRodModeStep1)
+            if (adding_rod_mode_step_1)
             {
                 GuiStatusBar((Rectangle){ 24, 24, 260, 40 }, "#191# Adding a rod (1) [SPACE to cancel]");
                 if (IsKeyPressed(KEY_SPACE))
                 {
-                    addingRodModeStep1 = false;
-                    activeRodToggle = -1;
+                    adding_rod_mode_step_1 = false;
+                    active_rod_toggle = -1;
                 }
                 else
                 {
-                    mousePosition = GetMousePosition();
-                    if (MouseInGrid(mousePosition, globeWidth, globeHeight))
+                    mouse_position = GetMousePosition();
+                    if (mouse_in_grid(mouse_position, globe_width, globe_height))
                     {
                         // Draw the tip shadow
                         DrawLineEx(
-                            mousePosition,
-                            (Vector2){mousePosition.x + 2.0f, mousePosition.y},
+                            mouse_position,
+                            (Vector2){mouse_position.x + 2.0f, mouse_position.y},
                             EVENT_RADIUS,
-                            eventColorList[colorIndex][1]
+                            colors_list[color_index][1]
                         );
 
                         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
                         {
                             // Get the tip screen coordinates
-                            tipPosition = GetMousePosition();
+                            tip_position = GetMousePosition();
 
                             // Create an event for the tip (in the LAB's frame)
-                            tipEvent = LorentzTransform(
-                                Event(ScreenToWorldX(tipPosition.x, globeWidth/2), ScreenToWorldY(tipPosition.y, globeHeight/2), eventColorList[colorIndex][0]),
-                                -observerVelocity
+                            tip_event = lorentz_transform(
+                                Event(screen_to_world_x(tip_position.x, globe_width/2), screen_to_world_y(tip_position.y, globe_height/2), colors_list[color_index][0]),
+                                -observer_velocity
                             );
 
-                            addingRodModeStep1 = false;
-                            addingRodModeStep2 = true;
-                            activeRodToggle = -1;  // This makes sure we don't come back to addingRodModeStep1 again
+                            adding_rod_mode_step_1 = false;
+                            adding_rod_mode_step_2 = true;
+                            active_rod_toggle = -1;  // This makes sure we don't come back to adding_rod_mode_step_1 again
                         }
                     }
                 }
             }
 
-            if (addingRodModeStep2)
+            if (adding_rod_mode_step_2)
             {
                 GuiStatusBar((Rectangle){ 24, 24, 260, 40 }, "#191# Adding a rod (2) [SPACE to cancel]");
                 if (IsKeyPressed(KEY_SPACE))
                 {
-                    addingRodModeStep2 = false;
-                    activeRodToggle = -1;
+                    adding_rod_mode_step_2 = false;
+                    active_rod_toggle = -1;
                 }
                 else
                 {
-                    mousePosition = GetMousePosition();
-                    if (MouseInGrid(mousePosition, globeWidth, globeHeight))
+                    mouse_position = GetMousePosition();
+                    if (mouse_in_grid(mouse_position, globe_width, globe_height))
                     {
                         // Draw shadow rod
                         DrawLineEx(
-                            tipPosition,
-                            (Vector2){mousePosition.x, tipPosition.y},
+                            tip_position,
+                            (Vector2){mouse_position.x, tip_position.y},
                             EVENT_RADIUS,
-                            eventColorList[colorIndex][1]
+                            colors_list[color_index][1]
                         );
 
                         if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
                         {
                             // Get tail position
-                            tailPosition = GetMousePosition();
+                            tail_position = GetMousePosition();
 
                             // Create an event for the tail (in the LAB's frame)
-                            tailEvent = LorentzTransform(
-                                Event(ScreenToWorldX(tailPosition.x, globeWidth/2), ScreenToWorldY(tailPosition.y, globeHeight/2), eventColorList[colorIndex][0]),
-                                -observerVelocity
+                            tail_event = lorentz_transform(
+                                Event(screen_to_world_x(tail_position.x, globe_width/2), screen_to_world_y(tail_position.y, globe_height/2), colors_list[color_index][0]),
+                                -observer_velocity
                             );
 
                             // Add the rod to the list
-                            rodsList.push_back(Rod(tipEvent, tailEvent, eventColorList[colorIndex][0]));
+                            rods_list.push_back(Rod(tip_event, tail_event, colors_list[color_index][0]));
 
-                            addingRodModeStep2 = false;
+                            adding_rod_mode_step_2 = false;
                         }
                     }
                 }
             }
             
             // Draw events
-            for (Event e: eventsList)
+            for (Event e: events_list)
             {
-                Event ePrime = LorentzTransform(e, observerVelocity);
+                Event ePrime = lorentz_transform(e, observer_velocity);
                 DrawCircleV(
-                    (Vector2) {WorldToScreenX(ePrime.getX(), globeWidth/2), WorldToScreenY(ePrime.getT(), globeHeight/2)},
+                    (Vector2) {world_to_screen_x(ePrime.get_x(), globe_width/2), world_to_screen_y(ePrime.get_t(), globe_height/2)},
                     EVENT_RADIUS,
-                    ePrime.getColor()
+                    ePrime.get_color()
                 );
             }
 
             // Draw rods
-            for (Rod r: rodsList)
+            for (Rod r: rods_list)
             {
-                Event tipPrime = LorentzTransform(r.getTipEvent(), observerVelocity);  // tip coordinates in the OBSERVER' frame
-                Event tail = r.getTailEvent(); // 
-                float gamma = GetGamma(observerVelocity);
+                Event tipPrime = lorentz_transform(r.get_tip_event(), observer_velocity);  // tip coordinates in the OBSERVER' frame
+                Event tail = r.get_tail_event(); // tail in the LAB's frame (because of the formula used)
+                float gamma = get_gamma(observer_velocity);
 
                 DrawLineEx(
-                    (Vector2){WorldToScreenX(tipPrime.getX(), globeWidth/2), WorldToScreenY(tipPrime.getT(), globeHeight/2)},
-                    (Vector2){WorldToScreenX(-observerVelocity * tipPrime.getT() + tail.getX()/gamma, globeWidth/2), WorldToScreenY(tipPrime.getT(), globeHeight/2)},
+                    (Vector2){world_to_screen_x(tipPrime.get_x(), globe_width/2), world_to_screen_y(tipPrime.get_t(), globe_height/2)},
+                    (Vector2){world_to_screen_x(-observer_velocity * tipPrime.get_t() + tail.get_x()/gamma, globe_width/2), world_to_screen_y(tipPrime.get_t(), globe_height/2)},
                     EVENT_RADIUS,
-                    r.getColor()
+                    r.get_color()
                 );
             }
 
-            GuiStatusBar((Rectangle){ 24, 24 + globeHeight, 250, 40 }, TextFormat("%i", eventsList.size() + rodsList.size()));
+            GuiStatusBar((Rectangle){ 24, 24 + globe_height, 250, 40 }, TextFormat("%i", events_list.size() + rods_list.size()));
 
         EndDrawing();
     }
@@ -617,43 +617,43 @@ int main()
 }
 
 
-float GetGamma(float observerVelocity)
+float get_gamma(float observer_velocity)
 {
-    return 1 / (sqrt(1.0f - pow(observerVelocity/C, 2)));
+    return 1 / (sqrt(1.0f - pow(observer_velocity/C, 2)));
 }
 
-Event LorentzTransform(Event point, float observerVelocity)
+Event lorentz_transform(Event point, float observer_velocity)
 {
-    float gamma = GetGamma(observerVelocity);
-    float x_prime = gamma * (point.getX() - observerVelocity * point.getT());
-    float t_prime = gamma * (point.getT() - (observerVelocity * point.getX() / pow(C, 2)));
+    float gamma = get_gamma(observer_velocity);
+    float x_prime = gamma * (point.get_x() - observer_velocity * point.get_t());
+    float t_prime = gamma * (point.get_t() - (observer_velocity * point.get_x() / pow(C, 2)));
     
-    return Event(x_prime, t_prime, point.getColor());
+    return Event(x_prime, t_prime, point.get_color());
 }
 
-float WorldToScreenX(float worldX, int offsetX)
+float world_to_screen_x(float world_x, int offset_x)
 {
-    return worldX * GRID_SPACING + MARGIN + offsetX;
+    return world_x * GRID_SPACING + MARGIN + offset_x;
 }
 
-float WorldToScreenY(float worldY, int offsetY)
+float world_to_screen_y(float world_y, int offset_y)
 {
-    return - worldY * GRID_SPACING + MARGIN + offsetY;
+    return - world_y * GRID_SPACING + MARGIN + offset_y;
 }
 
-float ScreenToWorldX(float screenX, int offsetX)
+float screen_to_world_x(float screen_x, int offset_x)
 {
-    return (screenX - MARGIN - offsetX) / GRID_SPACING;
+    return (screen_x - MARGIN - offset_x) / GRID_SPACING;
 }
 
-float ScreenToWorldY(float screenY, int offsetY)
+float screen_to_world_y(float screen_y, int offset_y)
 {
-    return (-screenY + MARGIN + offsetY) / GRID_SPACING ;
+    return (-screen_y + MARGIN + offset_y) / GRID_SPACING ;
 }
 
-bool MouseInGrid(Vector2 mouse, float gridWidth, float gridHeight)
+bool mouse_in_grid(Vector2 mouse, float globe_width, float globe_height)
 {
-    if ((MARGIN <= mouse.x && mouse.x <= MARGIN + gridWidth) && (MARGIN <= mouse.y && mouse.y <= MARGIN + gridHeight))
+    if ((MARGIN <= mouse.x && mouse.x <= MARGIN + globe_width) && (MARGIN <= mouse.y && mouse.y <= MARGIN + globe_height))
     {
         return true;
     }
