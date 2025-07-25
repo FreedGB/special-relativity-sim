@@ -15,8 +15,8 @@
 #define GRID_SPACING 50.0f
 #define C 1.0f
 #define EVENT_RADIUS 10.0f
-#define EVENT_BUTTON_HEIGHT 30.0f
-#define EVENT_BUTTON_WIDTH 70.0f
+#define EVENT_BUTTON_HEIGHT 20.0f
+#define EVENT_BUTTON_WIDTH 60.0f
 #define TEXT_FONT_SIZE 16.0f
 
 // Colors
@@ -134,7 +134,8 @@ int main()
     int event_dragged_index;
     int active_event_toggle = -1;
     int active_rod_toggle = -1;
-    bool active_checkbox = false;
+    bool show_coordinates = false;
+    bool show_nb_elements = true;
     Vector2 tip_position;
     Vector2 tail_position;
     Event tip_event;
@@ -378,10 +379,10 @@ int main()
             current_y += 20;
             DrawTextEx(font, TextFormat("Gamma = %.2f", get_gamma(observer_velocity)), (Vector2){current_x, current_y - 2}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
             
-            // Seeing coordinates checkbox
+            // See coordinates checkbox
             current_y += 20;
-            GuiCheckBox((Rectangle){current_x, current_y, TEXT_FONT_SIZE, TEXT_FONT_SIZE}, "See coordinates", &active_checkbox);
-            if (active_checkbox)
+            GuiCheckBox((Rectangle){current_x, current_y, TEXT_FONT_SIZE, TEXT_FONT_SIZE}, "See coordinates", &show_coordinates);
+            if (show_coordinates)
             {
                 mouse_position = GetMousePosition();
                 if (mouse_in_grid(mouse_position, globe_width, globe_height))
@@ -397,13 +398,17 @@ int main()
                 }
             }
             
-            // Event adding
+            // Elements adding
             current_x = left_margin;
             current_y += PANEL_BLOCKS_SPACING;
 
-            GuiLine((Rectangle){current_x, current_y, panel_width - 50, 10}, "Add an event");
+            GuiLine((Rectangle){current_x, current_y, panel_width - 50, 10}, "Add an element");
             current_y += TITLE_BOTTOM_MARGIN;
 
+            // Events
+            GuiGroupBox((Rectangle){current_x, current_y, panel_width - 50, EVENT_BUTTON_HEIGHT + 20}, "Events");
+            current_y += 10;
+            current_x += 10;
             adding_event_mode = false;
             GuiToggleGroup((Rectangle){current_x, current_y, EVENT_BUTTON_WIDTH, EVENT_BUTTON_HEIGHT}, "Red;Blue;Green", &active_event_toggle);
             if (active_event_toggle > -1)
@@ -413,19 +418,29 @@ int main()
             }
 
 
-            // Rod adding
+            // Rods
             current_x = left_margin;
-            current_y += PANEL_BLOCKS_SPACING;
-
-            GuiLine((Rectangle){current_x, current_y, panel_width - 50, 10}, "Add a rod");
-            current_y += TITLE_BOTTOM_MARGIN;
-
+            current_y += EVENT_BUTTON_HEIGHT + 20;
+            GuiGroupBox((Rectangle){current_x, current_y, panel_width - 50, EVENT_BUTTON_HEIGHT + 20}, "Rods");
+            current_y += 10;
+            current_x += 10;
+            adding_rod_mode_step_1 = false;
             GuiToggleGroup((Rectangle){current_x, current_y, EVENT_BUTTON_WIDTH, EVENT_BUTTON_HEIGHT}, "Red;Blue;Green", &active_rod_toggle);
             if (active_rod_toggle > -1)
             {
                 adding_rod_mode_step_1 = true;
                 adding_rod_mode_step_2 = false;
                 color_index = active_rod_toggle;
+            }
+
+            // See info panel checkbox
+            current_y += EVENT_BUTTON_HEIGHT + 20;
+            GuiCheckBox((Rectangle){current_x, current_y, TEXT_FONT_SIZE, TEXT_FONT_SIZE}, "Show number of elements", &show_nb_elements);
+            if (show_nb_elements)
+            {
+                GuiPanel((Rectangle){MARGIN, MARGIN + globe_height - 70, 150, 70 }, "Number of elements");
+                DrawTextEx(font, TextFormat("Events: %i", events_list.size()), (Vector2){MARGIN + 8,  MARGIN + globe_height - 40}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
+                DrawTextEx(font, TextFormat("Rods: %i", rods_list.size()), (Vector2){MARGIN + 8,  MARGIN + globe_height - 20}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
             }
 
             
@@ -633,8 +648,6 @@ int main()
                     r.get_color()
                 );
             }
-
-            GuiStatusBar((Rectangle){ 24, 24 + globe_height, 250, 40 }, TextFormat("%i", events_list.size() + rods_list.size()));
 
         EndDrawing();
     }
