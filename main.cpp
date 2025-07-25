@@ -208,7 +208,7 @@ int main()
             e2_obs = lorentz_transform(e2, observer_velocity);
             e3_obs = lorentz_transform(e3, observer_velocity);
 
-            // Drawing axes
+            // Drawing LAB frame's axes
             DrawLineEx(
                 (Vector2){world_to_screen_x(e0_obs.get_x(), globe_width/2), world_to_screen_y(e0_obs.get_t(), globe_height/2)},
                 (Vector2){world_to_screen_x(e1_obs.get_x(), globe_width/2), world_to_screen_y(e1_obs.get_t(), globe_height/2)},
@@ -222,7 +222,7 @@ int main()
                 SECONDARY_GRID_COLOR
             );
 
-            // Draw OBSERVER FRAME's axes
+            // Draw OBSERVER frame's axes
             DrawLineEx(
                 (Vector2){MARGIN + globe_width/2, MARGIN},
                 (Vector2){MARGIN + globe_width/2, MARGIN + globe_height},
@@ -233,6 +233,33 @@ int main()
                 (Vector2){MARGIN, MARGIN + globe_height/2},
                 (Vector2){MARGIN + globe_width, MARGIN + globe_height/2},
                 AXE_THICKNESS,
+                GRID_COLOR
+            );
+
+            // Draw the 4 arrows
+            // The order here matters, but I don't understand the logic. I just tried testing different orders
+            DrawTriangle(
+                (Vector2){MARGIN + globe_width/2, MARGIN},
+                (Vector2){MARGIN + globe_width/2 - 10.0f, MARGIN + 15.0f},
+                (Vector2){MARGIN + globe_width/2 + 10.0f, MARGIN + 15.0f},
+                GRID_COLOR
+            );
+            DrawTriangle(
+                (Vector2){MARGIN + globe_width/2 - 10.0f, MARGIN + globe_height - 15.0f},
+                (Vector2){MARGIN + globe_width/2, MARGIN + globe_height},
+                (Vector2){MARGIN + globe_width/2 + 10.0f, MARGIN + globe_height - 15.0f},
+                GRID_COLOR
+            );
+            DrawTriangle(
+                (Vector2){MARGIN + 15.0f, MARGIN + globe_height/2 - 10.0f},
+                (Vector2){MARGIN, MARGIN + globe_height/2},
+                (Vector2){MARGIN + 15.0f, MARGIN + globe_height/2 + 10.0f},
+                GRID_COLOR
+            );
+            DrawTriangle(
+                (Vector2){MARGIN + globe_width, MARGIN + globe_height/2},
+                (Vector2){MARGIN + globe_width - 15.0f, MARGIN + globe_height/2 - 10.0f},
+                (Vector2){MARGIN + globe_width - 15.0f, MARGIN + globe_height/2 + 10.0f},
                 GRID_COLOR
             );
 
