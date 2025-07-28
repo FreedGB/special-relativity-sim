@@ -5,6 +5,7 @@
 #include "raygui.h"
 
 #include "style_rltech.h"
+#include "style_genesis.h"
 
 // Global constants
 #define MARGIN 30.0f
@@ -20,9 +21,6 @@
 #define TEXT_FONT_SIZE 16.0f
 
 // Colors
-#define GRID_COLOR BLACK
-#define TEXT_COLOR BLACK
-#define SECONDARY_GRID_COLOR GRAY
 #define MAIN_RED RED
 #define SECONDARY_RED (Color){0xe6, 0x29, 0x37, 0xb8}
 #define MAIN_BLUE BLUE
@@ -111,11 +109,6 @@ int main()
     InitWindow(1000, 500, "SPACETIME GLOBE SIMULATION");
     SetTargetFPS(60);
 
-    Font font = LoadFont("rltech.ttf");
-    GuiLoadStyleRLTech();
-    GuiSetFont(font);
-    GuiSetStyle(DEFAULT, TEXT_SIZE, TEXT_FONT_SIZE);
-
     float globe_width;
     float globe_height;
     float panel_width;
@@ -140,6 +133,12 @@ int main()
     Vector2 tail_position;
     Event tip_event;
     Event tail_event;
+    int current_theme = 0;
+    int previous_theme = 0;
+    Font font;
+    Color text_color;
+    Color grid_color;
+    Color secondary_grid_color;
 
     // Define and initialize generic limit points
     Event e0_obs;
@@ -167,20 +166,53 @@ int main()
         {MAIN_GREEN, SECONDARY_GREEN}
     };
 
+    // Set RLTech theme as default
+    font = LoadFont("rltech.ttf");
+    GuiLoadStyleRLTech();
+    GuiSetFont(font);
+    text_color = GetColor(GuiGetStyle(DEFAULT, TEXT_COLOR_NORMAL));
+    grid_color = GetColor(GuiGetStyle(DEFAULT, BORDER_COLOR_NORMAL));
+    secondary_grid_color = GetColor(GuiGetStyle(DEFAULT, BORDER_COLOR_DISABLED));
+
     // Game loop
     while (!WindowShouldClose())
     {   
+        // Update globe and panel sizes
         globe_width = (2 * GetScreenWidth())/3 - 2 * MARGIN;
         globe_height = GetScreenHeight() - 2 * MARGIN;
         panel_width = GetScreenWidth()/3 - MARGIN;
         panel_height = globe_height;
+
+        // Update theme
+        if (previous_theme != current_theme)
+        {
+            GuiLoadStyleDefault(); // Unloads previous style
+
+            switch (current_theme)
+            {
+                case 0:
+                    GuiLoadStyleRLTech();
+                    font = LoadFont("rltech.ttf");
+                    break;
+                case 1:
+                    GuiLoadStyleGenesis();
+                    font = LoadFont("genesis.ttf");
+                    break;
+                default: break;
+            }
+            GuiSetFont(font);
+            text_color = GetColor(GuiGetStyle(DEFAULT, TEXT_COLOR_NORMAL));
+            grid_color = GetColor(GuiGetStyle(DEFAULT, BORDER_COLOR_NORMAL));
+            secondary_grid_color = GetColor(GuiGetStyle(DEFAULT, BORDER_COLOR_DISABLED));
+            previous_theme = current_theme;
+        }
 
         
         BeginDrawing();
             ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
 
             // Draw windows
-            DrawRectangleLinesEx((Rectangle){MARGIN, MARGIN, globe_width, globe_height}, BORDER_THICKNESS, GRID_COLOR);
+            DrawRectangleLinesEx((Rectangle){MARGIN, MARGIN, globe_width, globe_height}, BORDER_THICKNESS, grid_color);
             GuiPanel((Rectangle){globe_width + 2.0f*MARGIN, MARGIN, panel_width, panel_height}, "#142#Control panel");
 
             
@@ -191,8 +223,8 @@ int main()
             */
 
             // Draw labels
-            DrawTextEx(font, "space", (Vector2){MARGIN + globe_width - 70, MARGIN + globe_height/2 + 10}, TEXT_FONT_SIZE, 2, TEXT_COLOR);
-            DrawTextEx(font, "time", (Vector2){MARGIN + globe_height/2 + 10, MARGIN + 10}, TEXT_FONT_SIZE, 2, TEXT_COLOR);
+            DrawTextEx(font, "space", (Vector2){MARGIN + globe_width - 70, MARGIN + globe_height/2 + 10}, TEXT_FONT_SIZE, 2, text_color);
+            DrawTextEx(font, "time", (Vector2){MARGIN + globe_height/2 + 10, MARGIN + 10}, TEXT_FONT_SIZE, 2, text_color);
             
 
             // Draw LAB FRAME's axes on the OBSERVER's FRAME
@@ -214,13 +246,13 @@ int main()
                 (Vector2){world_to_screen_x(e0_obs.get_x(), globe_width/2), world_to_screen_y(e0_obs.get_t(), globe_height/2)},
                 (Vector2){world_to_screen_x(e1_obs.get_x(), globe_width/2), world_to_screen_y(e1_obs.get_t(), globe_height/2)},
                 SECONDARY_GRID_THICKNESS,
-                SECONDARY_GRID_COLOR
+                secondary_grid_color
             );
             DrawLineEx(
                 (Vector2){world_to_screen_x(e2_obs.get_x(), globe_width/2), world_to_screen_y(e2_obs.get_t(), globe_height/2)},
                 (Vector2){world_to_screen_x(e3_obs.get_x(), globe_width/2), world_to_screen_y(e3_obs.get_t(), globe_height/2)},
                 SECONDARY_GRID_THICKNESS,
-                SECONDARY_GRID_COLOR
+                secondary_grid_color
             );
 
             // Draw OBSERVER frame's axes
@@ -228,13 +260,13 @@ int main()
                 (Vector2){MARGIN + globe_width/2, MARGIN},
                 (Vector2){MARGIN + globe_width/2, MARGIN + globe_height},
                 AXE_THICKNESS,
-                GRID_COLOR
+                grid_color
             );
             DrawLineEx(
                 (Vector2){MARGIN, MARGIN + globe_height/2},
                 (Vector2){MARGIN + globe_width, MARGIN + globe_height/2},
                 AXE_THICKNESS,
-                GRID_COLOR
+                grid_color
             );
 
             // Draw the 4 arrows
@@ -243,25 +275,25 @@ int main()
                 (Vector2){MARGIN + globe_width/2, MARGIN},
                 (Vector2){MARGIN + globe_width/2 - 10.0f, MARGIN + 15.0f},
                 (Vector2){MARGIN + globe_width/2 + 10.0f, MARGIN + 15.0f},
-                GRID_COLOR
+                grid_color
             );
             DrawTriangle(
                 (Vector2){MARGIN + globe_width/2 - 10.0f, MARGIN + globe_height - 15.0f},
                 (Vector2){MARGIN + globe_width/2, MARGIN + globe_height},
                 (Vector2){MARGIN + globe_width/2 + 10.0f, MARGIN + globe_height - 15.0f},
-                GRID_COLOR
+                grid_color
             );
             DrawTriangle(
                 (Vector2){MARGIN + 15.0f, MARGIN + globe_height/2 - 10.0f},
                 (Vector2){MARGIN, MARGIN + globe_height/2},
                 (Vector2){MARGIN + 15.0f, MARGIN + globe_height/2 + 10.0f},
-                GRID_COLOR
+                grid_color
             );
             DrawTriangle(
                 (Vector2){MARGIN + globe_width, MARGIN + globe_height/2},
                 (Vector2){MARGIN + globe_width - 15.0f, MARGIN + globe_height/2 - 10.0f},
                 (Vector2){MARGIN + globe_width - 15.0f, MARGIN + globe_height/2 + 10.0f},
-                GRID_COLOR
+                grid_color
             );
 
 
@@ -286,13 +318,13 @@ int main()
                     (Vector2){world_to_screen_x(p_lab_1.get_x(), globe_width/2), world_to_screen_y(p_lab_1.get_t(), globe_height/2)},
                     (Vector2){world_to_screen_x(p_lab_2.get_x(), globe_width/2), world_to_screen_y(p_lab_2.get_t(), globe_height/2)},
                     SECONDARY_GRID_THICKNESS,
-                    SECONDARY_GRID_COLOR
+                    secondary_grid_color
                 );
                 DrawLineEx(
                     (Vector2){world_to_screen_x(p_lab_3.get_x(), globe_width/2), world_to_screen_y(p_lab_3.get_t(), globe_height/2)},
                     (Vector2){world_to_screen_x(p_lab_4.get_x(), globe_width/2), world_to_screen_y(p_lab_4.get_t(), globe_height/2)},
                     SECONDARY_GRID_THICKNESS,
-                    SECONDARY_GRID_COLOR
+                    secondary_grid_color
                 );
 
 
@@ -301,13 +333,13 @@ int main()
                     (Vector2){world_to_screen_x(p_obs_1.get_x(), globe_width/2), world_to_screen_y(p_obs_1.get_t(), globe_height/2)},
                     (Vector2){world_to_screen_x(p_obs_2.get_x(), globe_width/2), world_to_screen_y(p_obs_2.get_t(), globe_height/2)},
                     GRID_THICKNESS,
-                    GRID_COLOR
+                    grid_color
                 );
                 DrawLineEx(
                     (Vector2){world_to_screen_x(p_obs_3.get_x(), globe_width/2), world_to_screen_y(p_obs_3.get_t(), globe_height/2)},
                     (Vector2){world_to_screen_x(p_obs_4.get_x(), globe_width/2), world_to_screen_y(p_obs_4.get_t(), globe_height/2)},
                     GRID_THICKNESS,
-                    GRID_COLOR
+                    grid_color
                 );
 
             }
@@ -334,13 +366,13 @@ int main()
                     (Vector2){world_to_screen_x(p_lab_1.get_x(), globe_width/2), world_to_screen_y(p_lab_1.get_t(), globe_height/2)},
                     (Vector2){world_to_screen_x(p_lab_2.get_x(), globe_width/2), world_to_screen_y(p_lab_2.get_t(), globe_height/2)},
                     SECONDARY_GRID_THICKNESS,
-                    SECONDARY_GRID_COLOR
+                    secondary_grid_color
                 );
                 DrawLineEx(
                     (Vector2){world_to_screen_x(p_lab_3.get_x(), globe_width/2), world_to_screen_y(p_lab_3.get_t(), globe_height/2)},
                     (Vector2){world_to_screen_x(p_lab_4.get_x(), globe_width/2), world_to_screen_y(p_lab_4.get_t(), globe_height/2)},
                     SECONDARY_GRID_THICKNESS,
-                    SECONDARY_GRID_COLOR
+                    secondary_grid_color
                 );
 
 
@@ -349,13 +381,13 @@ int main()
                     (Vector2){world_to_screen_x(p_obs_1.get_x(), globe_width/2), world_to_screen_y(p_obs_1.get_t(), globe_height/2)},
                     (Vector2){world_to_screen_x(p_obs_2.get_x(), globe_width/2), world_to_screen_y(p_obs_2.get_t(), globe_height/2)},
                     GRID_THICKNESS,
-                    GRID_COLOR
+                    grid_color
                 );
                 DrawLineEx(
                     (Vector2){world_to_screen_x(p_obs_3.get_x(), globe_width/2), world_to_screen_y(p_obs_3.get_t(), globe_height/2)},
                     (Vector2){world_to_screen_x(p_obs_4.get_x(), globe_width/2), world_to_screen_y(p_obs_4.get_t(), globe_height/2)},
                     GRID_THICKNESS,
-                    GRID_COLOR
+                    grid_color
                 );
             }
 
@@ -374,10 +406,10 @@ int main()
 
             current_x -= 20;
             current_y += ELEMENT_SPACING;
-            DrawTextEx(font, TextFormat("Observer velocity = %.2f c", observer_velocity), (Vector2){current_x, current_y - 2}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
+            DrawTextEx(font, TextFormat("Observer velocity = %.2f c", observer_velocity), (Vector2){current_x, current_y - 2}, TEXT_FONT_SIZE, LETTER_SPACING, text_color);
 
             current_y += 20;
-            DrawTextEx(font, TextFormat("Gamma = %.2f", get_gamma(observer_velocity)), (Vector2){current_x, current_y - 2}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
+            DrawTextEx(font, TextFormat("Gamma = %.2f", get_gamma(observer_velocity)), (Vector2){current_x, current_y - 2}, TEXT_FONT_SIZE, LETTER_SPACING, text_color);
             
             // See coordinates checkbox
             current_y += 20;
@@ -393,7 +425,7 @@ int main()
                         (Vector2){mouse_position.x + 5, mouse_position.y - 20},
                         TEXT_FONT_SIZE,
                         LETTER_SPACING,
-                        TEXT_COLOR
+                        text_color
                     );
                 }
             }
@@ -450,15 +482,18 @@ int main()
             if (show_nb_elements)
             {
                 GuiPanel((Rectangle){MARGIN, MARGIN + globe_height - 70, 150, 70 }, "Number of elements");
-                DrawTextEx(font, TextFormat("Events: %i", events_list.size()), (Vector2){MARGIN + 8,  MARGIN + globe_height - 40}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
-                DrawTextEx(font, TextFormat("Rods: %i", rods_list.size()), (Vector2){MARGIN + 8,  MARGIN + globe_height - 20}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
+                DrawTextEx(font, TextFormat("Events: %i", events_list.size()), (Vector2){MARGIN + 8,  MARGIN + globe_height - 40}, TEXT_FONT_SIZE, LETTER_SPACING, text_color);
+                DrawTextEx(font, TextFormat("Rods: %i", rods_list.size()), (Vector2){MARGIN + 8,  MARGIN + globe_height - 20}, TEXT_FONT_SIZE, LETTER_SPACING, text_color);
             }
+
+            // Theme selector
+            GuiComboBox((Rectangle){MARGIN + globe_width - 150, MARGIN, 150, 30}, "RLtech theme;Genesis theme", &current_theme);
 
             
             // Clear all button
             current_x = left_margin;
             current_y += EVENT_BUTTON_HEIGHT + 20;
-            if (GuiButton((Rectangle){current_x, current_y, 200, 30}, "Clear all elements"))
+            if (GuiButton((Rectangle){current_x, current_y, 200, 30}, "#143#Clear all elements"))
             {
                 events_list.clear();
                 rods_list.clear();
@@ -507,7 +542,7 @@ int main()
             if (dragging_mode)
             {   
                 GuiPanel((Rectangle){MARGIN, MARGIN, 260, 100}, "#191#Dragging ana event");
-                DrawTextEx(font, "- Hold LEFT_MOUSE to move.\n- Release LEFT_MOUSE to stop.", (Vector2){MARGIN + 8, MARGIN + 40}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
+                DrawTextEx(font, "- Hold LEFT_MOUSE to move.\n- Release LEFT_MOUSE to stop.", (Vector2){MARGIN + 8, MARGIN + 40}, TEXT_FONT_SIZE, LETTER_SPACING, text_color);
                 
                 // Get event new coordinates (in the observer's frame)
                 mouse_position = GetMousePosition();
@@ -527,7 +562,7 @@ int main()
             if (adding_event_mode)
             {   
                 GuiPanel((Rectangle){MARGIN, MARGIN, 260, 100}, "#191#Adding an event");
-                DrawTextEx(font, "LEFT_MOUSE to place.\nSPACE to cancel.", (Vector2){MARGIN + 8, MARGIN + 40}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
+                DrawTextEx(font, "LEFT_MOUSE to place.\nSPACE to cancel.", (Vector2){MARGIN + 8, MARGIN + 40}, TEXT_FONT_SIZE, LETTER_SPACING, text_color);
                 
                 if (IsKeyPressed(KEY_SPACE))
                 {
@@ -564,7 +599,7 @@ int main()
             if (adding_rod_mode_step_1)
             {
                 GuiPanel((Rectangle){MARGIN, MARGIN, 260, 100}, "#191#Adding a rod [1]");
-                DrawTextEx(font, "1- LEFT_MOUSE to place the tip.\n2- RIGHT_MOUSE to place the tail.\nSPACE to cancel", (Vector2){MARGIN + 8, MARGIN + 40}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
+                DrawTextEx(font, "1- LEFT_MOUSE to place the tip.\n2- RIGHT_MOUSE to place the tail.\nSPACE to cancel", (Vector2){MARGIN + 8, MARGIN + 40}, TEXT_FONT_SIZE, LETTER_SPACING, text_color);
                 
                 if (IsKeyPressed(KEY_SPACE))
                 {
@@ -606,7 +641,7 @@ int main()
             if (adding_rod_mode_step_2)
             {
                 GuiPanel((Rectangle){MARGIN, MARGIN, 260, 100}, "#191#Adding a rod [2]");
-                DrawTextEx(font, "1- LEFT_MOUSE to place the tip.\n2- RIGHT_MOUSE to place the tail.\nSPACE to cancel", (Vector2){MARGIN + 8, MARGIN + 40}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
+                DrawTextEx(font, "1- LEFT_MOUSE to place the tip.\n2- RIGHT_MOUSE to place the tail.\nSPACE to cancel", (Vector2){MARGIN + 8, MARGIN + 40}, TEXT_FONT_SIZE, LETTER_SPACING, text_color);
                 if (IsKeyPressed(KEY_SPACE))
                 {
                     adding_rod_mode_step_2 = false;
