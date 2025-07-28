@@ -20,7 +20,6 @@
 #define TEXT_FONT_SIZE 16.0f
 
 // Colors
-// #define BACKGROUND_COLOR RAYWHITE
 #define GRID_COLOR BLACK
 #define TEXT_COLOR BLACK
 #define SECONDARY_GRID_COLOR GRAY
@@ -111,6 +110,7 @@ int main()
     // Game definitions
     InitWindow(1000, 500, "SPACETIME GLOBE SIMULATION");
     SetTargetFPS(60);
+
     Font font = LoadFont("rltech.ttf");
     GuiLoadStyleRLTech();
     GuiSetFont(font);
@@ -467,8 +467,6 @@ int main()
 
             // Modes
 
-            // TO DO: Make the modes exclusives (one mode at a time)
-
             // Drag and drop
             dragging_mode = false;
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
@@ -507,8 +505,9 @@ int main()
             }
 
             if (dragging_mode)
-            {    
-                GuiStatusBar((Rectangle){ 24, 24, 160, 40 }, "#191#Dragging mode");
+            {   
+                GuiPanel((Rectangle){MARGIN, MARGIN, 260, 100}, "#191#Dragging ana event");
+                DrawTextEx(font, "- Hold LEFT_MOUSE to move.\n- Release LEFT_MOUSE to stop.", (Vector2){MARGIN + 8, MARGIN + 40}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
                 
                 // Get event new coordinates (in the observer's frame)
                 mouse_position = GetMousePosition();
@@ -527,7 +526,9 @@ int main()
             // Add an event
             if (adding_event_mode)
             {   
-                GuiStatusBar((Rectangle){ 24, 24, 260, 40 }, "#191#Adding an event [SPACE to cancel]");
+                GuiPanel((Rectangle){MARGIN, MARGIN, 260, 100}, "#191#Adding an event");
+                DrawTextEx(font, "LEFT_MOUSE to place.\nSPACE to cancel.", (Vector2){MARGIN + 8, MARGIN + 40}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
+                
                 if (IsKeyPressed(KEY_SPACE))
                 {
                     active_event_toggle = -1;
@@ -562,7 +563,9 @@ int main()
             // Add a rod
             if (adding_rod_mode_step_1)
             {
-                GuiStatusBar((Rectangle){ 24, 24, 260, 40 }, "#191# Adding a rod (1) [SPACE to cancel]");
+                GuiPanel((Rectangle){MARGIN, MARGIN, 260, 100}, "#191#Adding a rod [1]");
+                DrawTextEx(font, "1- LEFT_MOUSE to place the tip.\n2- RIGHT_MOUSE to place the tail.\nSPACE to cancel", (Vector2){MARGIN + 8, MARGIN + 40}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
+                
                 if (IsKeyPressed(KEY_SPACE))
                 {
                     adding_rod_mode_step_1 = false;
@@ -602,7 +605,8 @@ int main()
 
             if (adding_rod_mode_step_2)
             {
-                GuiStatusBar((Rectangle){ 24, 24, 260, 40 }, "#191# Adding a rod (2) [SPACE to cancel]");
+                GuiPanel((Rectangle){MARGIN, MARGIN, 260, 100}, "#191#Adding a rod [2]");
+                DrawTextEx(font, "1- LEFT_MOUSE to place the tip.\n2- RIGHT_MOUSE to place the tail.\nSPACE to cancel", (Vector2){MARGIN + 8, MARGIN + 40}, TEXT_FONT_SIZE, LETTER_SPACING, TEXT_COLOR);
                 if (IsKeyPressed(KEY_SPACE))
                 {
                     adding_rod_mode_step_2 = false;
@@ -659,6 +663,7 @@ int main()
                 Event tail = r.get_tail_event(); // tail in the LAB's frame (because of the formula used)
                 float gamma = get_gamma(observer_velocity);
 
+                // Draw contracted rod. Formula explained in README.md
                 DrawLineEx(
                     (Vector2){world_to_screen_x(tipPrime.get_x(), globe_width/2), world_to_screen_y(tipPrime.get_t(), globe_height/2)},
                     (Vector2){world_to_screen_x(-observer_velocity * tipPrime.get_t() + tail.get_x()/gamma, globe_width/2), world_to_screen_y(tipPrime.get_t(), globe_height/2)},
