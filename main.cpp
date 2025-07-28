@@ -20,7 +20,7 @@
 #define TEXT_FONT_SIZE 16.0f
 
 // Colors
-#define BACKGROUND_COLOR RAYWHITE
+// #define BACKGROUND_COLOR RAYWHITE
 #define GRID_COLOR BLACK
 #define TEXT_COLOR BLACK
 #define SECONDARY_GRID_COLOR GRAY
@@ -171,13 +171,13 @@ int main()
     while (!WindowShouldClose())
     {   
         globe_width = (2 * GetScreenWidth())/3 - 2 * MARGIN;
-        globe_height = GetScreenHeight() - 3 * MARGIN;
+        globe_height = GetScreenHeight() - 2 * MARGIN;
         panel_width = GetScreenWidth()/3 - MARGIN;
         panel_height = globe_height;
 
         
         BeginDrawing();
-            ClearBackground(BACKGROUND_COLOR);
+            ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
 
             // Draw windows
             DrawRectangleLinesEx((Rectangle){MARGIN, MARGIN, globe_width, globe_height}, BORDER_THICKNESS, GRID_COLOR);
@@ -415,6 +415,12 @@ int main()
             {
                 adding_event_mode = true;
                 color_index = active_event_toggle;
+
+                // Disable other modes
+                dragging_mode = false;
+                adding_rod_mode_step_1 = false;
+                adding_rod_mode_step_2 = false;
+                active_rod_toggle = -1;
             }
 
 
@@ -431,6 +437,11 @@ int main()
                 adding_rod_mode_step_1 = true;
                 adding_rod_mode_step_2 = false;
                 color_index = active_rod_toggle;
+
+                // Disable other modes
+                dragging_mode = false;
+                adding_event_mode = false;
+                active_event_toggle = -1;
             }
 
             // See info panel checkbox
@@ -447,7 +458,7 @@ int main()
             // Clear all button
             current_x = left_margin;
             current_y += EVENT_BUTTON_HEIGHT + 20;
-            if (GuiButton((Rectangle){current_x, current_y, 200, 30}, "Clear all"))
+            if (GuiButton((Rectangle){current_x, current_y, 200, 30}, "Clear all elements"))
             {
                 events_list.clear();
                 rods_list.clear();
@@ -479,6 +490,13 @@ int main()
                     {
                         dragging_mode = true;
                         event_dragged_index = i;
+
+                        // Disable other modes
+                        adding_event_mode = false;
+                        active_event_toggle = -1;
+                        adding_rod_mode_step_1 = false;
+                        adding_rod_mode_step_2 = false;
+                        active_rod_toggle = -1;
                         break;
                     }
                 }
@@ -489,7 +507,7 @@ int main()
             }
 
             if (dragging_mode)
-            {
+            {    
                 GuiStatusBar((Rectangle){ 24, 24, 160, 40 }, "#191#Dragging mode");
                 
                 // Get event new coordinates (in the observer's frame)
@@ -508,7 +526,7 @@ int main()
 
             // Add an event
             if (adding_event_mode)
-            {
+            {   
                 GuiStatusBar((Rectangle){ 24, 24, 260, 40 }, "#191#Adding an event [SPACE to cancel]");
                 if (IsKeyPressed(KEY_SPACE))
                 {
