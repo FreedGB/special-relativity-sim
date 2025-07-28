@@ -402,7 +402,7 @@ int main()
 
             current_y += TITLE_BOTTOM_MARGIN;
             current_x += 26;
-            GuiSlider((Rectangle){current_x, current_y, panel_width - 100, 15}, "-c", "c", &observer_velocity, -1.0f*C, 1.0f*C);
+            GuiSlider((Rectangle){current_x, current_y, panel_width - 100, 15}, "-c", "c", &observer_velocity, -0.99f*C, 0.99f*C);
 
             current_x -= 20;
             current_y += ELEMENT_SPACING;
