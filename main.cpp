@@ -4,8 +4,8 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
-#include "style_rltech.h"
-#include "style_genesis.h"
+#include "./styles/style_rltech.h"
+#include "./styles/style_genesis.h"
 
 // Global constants
 #define MARGIN 30.0f
@@ -167,7 +167,7 @@ int main()
     };
 
     // Set RLTech theme as default
-    font = LoadFont("rltech.ttf");
+    font = LoadFont("./fonts/rltech.ttf");
     GuiLoadStyleRLTech();
     GuiSetFont(font);
     text_color = GetColor(GuiGetStyle(DEFAULT, TEXT_COLOR_NORMAL));
@@ -192,11 +192,11 @@ int main()
             {
                 case 0:
                     GuiLoadStyleRLTech();
-                    font = LoadFont("rltech.ttf");
+                    font = LoadFont("./fonts/rltech.ttf");
                     break;
                 case 1:
                     GuiLoadStyleGenesis();
-                    font = LoadFont("genesis.ttf");
+                    font = LoadFont("./fonts/genesis.ttf");
                     break;
                 default: break;
             }

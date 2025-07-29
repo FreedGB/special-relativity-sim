@@ -1,2 +1,2 @@
 main: main.cpp
-	g++ main.cpp -o main -lraylib
+	g++ main.cpp -o spacetime_globe -lraylib

@@ -1,0 +1,1 @@
+g++ -o spacetime_globe main.cpp -I"path/to/raylib/src" -lraylib -lgdi32 -lwinmm
