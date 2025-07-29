@@ -1,6 +1,5 @@
 # Spacetime Globe Simulation
 
-A graphical simulation built with Raylib and Raygui to visualize fundamental concepts of Special Relativity: Lorentz transformations, time dilation, and length contraction in a 1D space and 1D time (1+1D) spacetime diagram.
 
 ## Description
 
@@ -10,13 +9,13 @@ This project is an interactive spacetime diagram where you can observe how event
 - Understand Lorentz transformations by seeing how coordinates of events change between these frames.
 - Demonstrate relativistic effects like time dilation and length contraction through interactive elements.
 
-This visual tool is highly inspired by the spacetime globe shown in minutephysics special relativity video series.
+This visual tool is highly inspired by the spacetime globe shown in [minutephysics special relativity video series](https://www.youtube.com/playlist?list=PLoaVOjvkzQtyjhV55wZcdicAz5KexgKvm).
 
 ## Getting Started (Installation)
 
 This project uses `Raylib` and `Raygui`, great librairies to make video games using C/C++.
 
-### For Windows users ⊞
+### * For Windows users
 
 1.  **Download Raylib:**
 
@@ -49,7 +48,7 @@ This project uses `Raylib` and `Raygui`, great librairies to make video games us
     ```
 
 
-### For Ubuntu users 🐧
+### * For Ubuntu users
 
 1.  **Install Build Essentials:**
 
@@ -121,11 +120,13 @@ This tool allows you to:
 - Change your observer's velocity ($v$) relative to the Lab Frame using a slider. As $v$ approaches the speed of light ($c$), you'll observe the relativistic effects.
 
 > [!NOTE]
-> $c$ (speed of light) is normalized to `1.0` in this simulation. So, the observer's speed $v$ is mesured as a fraction of $c$.
+> $c$ (speed of light) is normalized to `1.0` in this simulation. So, the observer's speed $v$ is mesured as a fraction of $c$
 
 - Place individual "events" (spacetime points) in the Lab frame and see how their coordinates change in the Observer frame.
 
 - Place "rods" (representing extended objects) in the Lab frame and witness their length contraction when viewed from a moving Observer frame.
+
+- Change the theme by clicking on the top-rigth corner of the globe.
 
 The interface is clear and user-friendly, so you're highly encouraged to poke around to understand how it works.
 
@@ -144,8 +145,8 @@ As you increase the `observer_velocity`, the vertical line (worldline) formed by
 
 ![Time dilation step 2](images/time_dilation_step_2.png)
 
-> [!NOTE]
-> Note that the events doesn't happen at the same place anymore from that point of view. 
+> [!WARNING]
+> Note that the events doesn't happen at the same place anymore from that point of view. This is really important.
 
 ### Length Contraction
 
