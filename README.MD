@@ -2,7 +2,7 @@
 
 
 ## Introduction to special relativity
-Special relativity, elaborated by Albert Einstein, is a relatively () popular theory in physics. It has significantly changed our understanding of the universe by establishing a relationship between space and time. It is based on two postulates:
+Special relativity, elaborated by Albert Einstein, is a relatively (😉) popular theory in physics. It has significantly changed our understanding of the universe by establishing a relationship between space and time. It is based on two postulates:
 - The laws of physics are invariant (identical) in all inertial frames of reference (that is, frames of reference with no acceleration). This is known as the **principle of relativity**.
 - The speed of light in vacuum is the same for all observers, regardless of the motion of light source or observer. This is known as the **principle of light constancy**.
 
@@ -184,9 +184,7 @@ If we consider the version of the tail happening at the time coordinate as the t
 
 To implement the rod, I had to use a special formula to place the tail of the rod correctly:
 
-$
-    x'_{tail} =  - v \times t'_{tip} + \frac{x_{tail}}{\gamma} 
-$
+$x'_{tail} =  - v \times t'_{tip} + \frac{x_{tail}}{\gamma}$
 
 - $x'_{tail}$ is the space coordinate of the tail in the Observer frame
 - $v$ is the Observer velocity relative to the Lab frame
