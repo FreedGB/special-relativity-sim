@@ -184,7 +184,7 @@ If we consider the version of the tail happening at the time coordinate as the t
 
 To implement the rod, I had to use a special formula to place the tail of the rod correctly:
 
-It is: $x'_{tail} =  - v \times t'_{tip} + \frac{x_{tail}}{\gamma}$
+It is: $x'_{tail}=-v\times t'_{tip}+\frac{x_{tail}}{\gamma}$
 
 - $x'_{tail}$ is the space coordinate of the tail in the Observer frame
 - $v$ is the Observer velocity relative to the Lab frame
