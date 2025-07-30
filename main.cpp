@@ -106,6 +106,7 @@ bool mouse_in_grid(Vector2 mouse, float globe_width, float globe_height);
 int main()
 {
     // Game definitions
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1000, 500, "SPACETIME GLOBE SIMULATION");
     SetTargetFPS(60);
 

@@ -1,6 +1,18 @@
 # Spacetime Globe Simulation
 
 
+## Introduction to special relativity
+Special relativity, elaborated by Albert Einstein, is a relatively () popular theory in physics. It has significantly changed our understanding of the universe by establishing a relationship between space and time. It is based on two postulates:
+- The laws of physics are invariant (identical) in all inertial frames of reference (that is, frames of reference with no acceleration). This is known as the **principle of relativity**.
+- The speed of light in vacuum is the same for all observers, regardless of the motion of light source or observer. This is known as the **principle of light constancy**.
+
+In special relativity, observing things from different perspectives, especially moving perspectives, requires a mathematical tool named **Lorentz transformation**.
+
+When students (including myself) are introduced to special relativity, it's generally with a buch of abstract formulas, which doesn't really help understand the underlying concepts.
+
+This project comes with a solution to that problem. It is an interactive **Spacetime globe**, a visual tool to help build a strong intuition on how special relativity changes space and time perception. It is inspired by the spacetime globe shown in [minutephysics special relativity video series](https://www.youtube.com/playlist?list=PLoaVOjvkzQtyjhV55wZcdicAz5KexgKvm).
+
+
 ## Description
 
 This project is an interactive spacetime diagram where you can observe how events and objects (rods) appear differently to observers moving at various relativistic velocities. It illustrates the core principles of special relativity, allowing users to:
@@ -9,7 +21,6 @@ This project is an interactive spacetime diagram where you can observe how event
 - Understand Lorentz transformations by seeing how coordinates of events change between these frames.
 - Demonstrate relativistic effects like time dilation and length contraction through interactive elements.
 
-This visual tool is highly inspired by the spacetime globe shown in [minutephysics special relativity video series](https://www.youtube.com/playlist?list=PLoaVOjvkzQtyjhV55wZcdicAz5KexgKvm).
 
 ## Getting Started (Installation)
 
@@ -19,11 +30,17 @@ This project uses `Raylib` and `Raygui`, great librairies to make video games us
 
 1.  **Download Raylib:**
 
-    - Go to [Raylib website](https://www.raylib.com/) and click on "Download Now" to downlaod the installer. The installer comes with MinGW compiler, so no need to download it.
+    - Go to [Raylib website](https://www.raylib.com/) and click on "Download Now" to downlaod the installer. The installer comes with MinGW compiler, so no need to download it separately.
 
-    - Once downloaded, run the installer with admin rights to install Raylib.
+    - Once downloaded, run the Raylib installer.
 
-    - Navigate to the folder where you installed Raylib, and copy the path to `src` folder somewhere, you'll need it to run the simulation.
+    - Next, you'll need to add the path of the MinGW compiler into the environnement variable. To do so:
+        - Search for **Modify environnement variables** and click on **Environnement variables** button at the bottom
+        - Now, select the **Path** variable on the top, and click **Modify**. Another window will open.
+        - Click on **New**, then **Navigate**. Look for the `w64devkit\bin` folder located in the folder where you install Raylib. The default path should be `C:\raylib\w64devkit\bin`.
+        - Click **OK** in every window opened so far.
+    
+    Raylib is now installed.
 
 2. **Download Raygui:**
 
@@ -34,18 +51,18 @@ This project uses `Raylib` and `Raygui`, great librairies to make video games us
     - Go to the `src` folder in the folder where you installed Raylib, and paste the `raygui.h` file there.
 
 
-3.  **Compile the project:**
+3. **Download the project:**
 
-    - Download this project with `git clone` or downloading the zip version (don't forget to extract it if you downloaded the zip version).
+    - Go to the **Releases** section of the project, and download the zip file for Windows.
 
-    - Open the project with Visual Studio Code, or your prefered IDE.
+    - Unzip the file, launch the `spacetime_globe.exe` file and you're ready to go!
 
-    - Go to `build_windows.bash` file and replace `path/to/raylib/src` with the path you copied.
 
-    - Open the terminal and run the build file:
-    ```bash
-    bash build_windows.bash
-    ```
+If you want to compile the project by yourself, feel free to download this repository and run this command:
+```bash
+g++ main.cpp -o spacetime_globe.exe -I"path/to/raylib/src" -lraylib -lgdi32 -lwinmm
+```
+Replace `path/to/raylib/src` with the actual path.
 
 
 ### * For Ubuntu users
@@ -81,21 +98,18 @@ This project uses `Raylib` and `Raygui`, great librairies to make video games us
 
     - Go to the `src` folder in the folder where you installed Raylib, and paste the `raygui.h` file there.
 
-4.  **Compile the project:**
+4. **Download the project:**
 
-    - Download this project with `git clone` or downloading the zip version (don't forget to extract it if you downloaded the zip version).
+    - Go to the **Releases** section of the project, and download the zip file for Ubuntu.
 
-    - Open the project with Visual Studio Code, or your prefered IDE.
+    - Unzip the file, launch the `spacetime_globe.exe` file and you're ready to go!
 
-    - Open the terminal and run the Makefile file:
-    ```bash
-    make main
-    ```
 
-Whatever your system is, you can run the simulation by using:
+If you want to compile the project by yourself, feel free to download this repository and run this command:
 ```bash
-./spacetime_globe
+g++ main.cpp -o spacetime_globe.exe -lraylib
 ```
+Replace `path/to/raylib/src` with the actual path.
 
 
 
@@ -103,7 +117,7 @@ Whatever your system is, you can run the simulation by using:
 
 ![Spacetime Globe Simulation](images/spacetime_globe_simulation.png)
 
-The simulation displays a 2D spacetime diagram with a spatial axis (horizontal) and a temporal axis (vertical). One unit on the x-axis represents $3\times 10^8$ meters (the distance light travel in one second) and one unit on the y-axis represents $1$ second.
+The simulation displays a 2D spacetime diagram with a spatial axis (horizontal) and a temporal axis (vertical). One unit on the x-axis represents approximately $3\times 10^8$ meters (the distance light travels in one second) and one unit on the y-axis represents $1$ second.
 
 Two frames are used in this simulation:
 
@@ -169,9 +183,11 @@ If we consider the version of the tail happening at the time coordinate as the t
 ![Length contraction 3](images/length_contraction_step_3.png)
 
 To implement the rod, I had to use a special formula to place the tail of the rod correctly:
-$$
+
+$
     x'_{tail} =  - v \times t'_{tip} + \frac{x_{tail}}{\gamma} 
-$$
+$
+
 - $x'_{tail}$ is the space coordinate of the tail in the Observer frame
 - $v$ is the Observer velocity relative to the Lab frame
 - $t'_{tip}$ is the time coordinate of the tip in the Observer frame
