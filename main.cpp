@@ -225,7 +225,8 @@ int main()
 
             // Draw labels
             DrawTextEx(font, "space", (Vector2){MARGIN + globe_width - 70, MARGIN + globe_height/2 + 10}, TEXT_FONT_SIZE, 2, text_color);
-            DrawTextEx(font, "time", (Vector2){MARGIN + globe_height/2 + 10, MARGIN + 10}, TEXT_FONT_SIZE, 2, text_color);
+            DrawTextEx(font, "(x 3x10^8 meters)", (Vector2){MARGIN + globe_width - 150, MARGIN + globe_height/2 + 25}, TEXT_FONT_SIZE, 2, text_color);
+            DrawTextEx(font, "time\n(seconds)", (Vector2){MARGIN + globe_height/2 + 10, MARGIN + 10}, TEXT_FONT_SIZE, 2, text_color);
             
 
             // Draw LAB FRAME's axes on the OBSERVER's FRAME

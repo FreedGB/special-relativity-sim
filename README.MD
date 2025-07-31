@@ -2,15 +2,15 @@
 
 
 ## Introduction to special relativity
-Special relativity, elaborated by Albert Einstein, is a relatively (😉) popular theory in physics. It has significantly changed our understanding of the universe by establishing a relationship between space and time. It is based on two postulates:
+Special relativity, developed by Albert Einstein, is a relatively (😉) popular theory in physics. It has significantly changed our understanding of the universe by establishing a relationship between space and time. It is based on two postulates:
 - The laws of physics are invariant (identical) in all inertial frames of reference (that is, frames of reference with no acceleration). This is known as the **principle of relativity**.
-- The speed of light in vacuum is the same for all observers, regardless of the motion of light source or observer. This is known as the **principle of light constancy**.
+- The speed of light in vacuum is the same for all observers, regardless of the motion of the light source or observer. This is known as the **principle of light constancy**.
 
-In special relativity, observing things from different perspectives, especially moving perspectives, requires a mathematical tool named **Lorentz transformation**.
+In special relativity, observing things from different perspectives, especially moving perspectives, requires a mathematical tool called **Lorentz transformations**.
 
-When students (including myself) are introduced to special relativity, it's generally with a buch of abstract formulas, which doesn't really help understand the underlying concepts.
+When students (including myself) are introduced to special relativity, it's generally with a bunch of abstract formulas, which don't really help you understand the underlying concepts.
 
-This project comes with a solution to that problem. It is an interactive **Spacetime globe**, a visual tool to help build a strong intuition on how special relativity changes space and time perception. It is inspired by the spacetime globe shown in [minutephysics special relativity video series](https://www.youtube.com/playlist?list=PLoaVOjvkzQtyjhV55wZcdicAz5KexgKvm).
+This project comes with a solution to that problem. It is an interactive **Spacetime globe**, a visual tool to help build a strong intuition for how special relativity changes space and time perception. It is inspired by the spacetime globe shown in [minutephysics special relativity video series](https://www.youtube.com/playlist?list=PLoaVOjvkzQtyjhV55wZcdicAz5KexgKvm).
 
 
 ## Description
@@ -24,20 +24,20 @@ This project is an interactive spacetime diagram where you can observe how event
 
 ## Getting Started (Installation)
 
-This project uses `Raylib` and `Raygui`, great librairies to make video games using C/C++.
+This project uses `Raylib` and `Raygui`, great libraries to make video games using C/C++.
 
 ### * For Windows users
 
 1.  **Download Raylib:**
 
-    - Go to [Raylib website](https://www.raylib.com/) and click on "Download Now" to downlaod the installer. The installer comes with MinGW compiler, so no need to download it separately.
+    - Go to [Raylib website](https://www.raylib.com/) and click on "Download Now" to download the installer. The installer comes with MinGW compiler, so no need to download it separately.
 
     - Once downloaded, run the Raylib installer.
 
-    - Next, you'll need to add the path of the MinGW compiler into the environnement variable. To do so:
-        - Search for **Modify environnement variables** and click on **Environnement variables** button at the bottom
-        - Now, select the **Path** variable on the top, and click **Modify**. Another window will open.
-        - Click on **New**, then **Navigate**. Look for the `w64devkit\bin` folder located in the folder where you install Raylib. The default path should be `C:\raylib\w64devkit\bin`.
+    - Next, you'll need to add the MinGW compiler's path to the user environment variable. To do so:
+        - Search for **Modify environment variables** and click on **Environment variables** button at the bottom
+        - Under **User variables**, select the **Path** variable, and click **Modify**. Another window will open.
+        - Click **New**, and paste the path to the `w64devkit\bin` folder, located in the folder where you installed Raylib. The default path should be `C:\raylib\w64devkit\bin`.
         - Click **OK** in every window opened so far.
     
     Raylib is now installed.
@@ -55,7 +55,7 @@ This project uses `Raylib` and `Raygui`, great librairies to make video games us
 
     - Go to the **Releases** section of the project, and download the zip file for Windows.
 
-    - Unzip the file, launch the `spacetime_globe.exe` file and you're ready to go!
+    - Unzip the file, launch the `spacetime_globe.exe` executable and you're ready to go!
 
 
 If you want to compile the project by yourself, feel free to download this repository and run this command:
@@ -69,7 +69,7 @@ Replace `path/to/raylib/src` with the actual path.
 
 1.  **Install Build Essentials:**
 
-    This will help install `g++`, the C++ compiler. Open your terminal, and enter these commands:
+    This ensures that `g++`, the C++ compiler, is installed. Open your terminal, and enter these commands:
     ```bash
     sudo apt-get update
     sudo apt-get upgrade
@@ -92,7 +92,7 @@ Replace `path/to/raylib/src` with the actual path.
 
 3. **Download Raygui:**
 
-    It is just like for Windows.
+    It is the same as for Windows.
     
     - Go to [Raygui repository](https://github.com/raysan5/raygui), move to `src` and download `raygui.h`.
 
@@ -102,12 +102,12 @@ Replace `path/to/raylib/src` with the actual path.
 
     - Go to the **Releases** section of the project, and download the zip file for Ubuntu.
 
-    - Unzip the file, launch the `spacetime_globe.exe` file and you're ready to go!
+    - Unzip the file, launch the `spacetime_globe` file and you're ready to go!
 
 
 If you want to compile the project by yourself, feel free to download this repository and run this command:
 ```bash
-g++ main.cpp -o spacetime_globe.exe -lraylib
+g++ main.cpp -o spacetime_globe -lraylib
 ```
 Replace `path/to/raylib/src` with the actual path.
 
@@ -134,20 +134,20 @@ This tool allows you to:
 - Change your observer's velocity ($v$) relative to the Lab Frame using a slider. As $v$ approaches the speed of light ($c$), you'll observe the relativistic effects.
 
 > [!NOTE]
-> $c$ (speed of light) is normalized to `1.0` in this simulation. So, the observer's speed $v$ is mesured as a fraction of $c$
+> $c$ (speed of light) is normalized to `1.0` in this simulation. So, the observer's speed $v$ is measured as a fraction of $c$
 
 - Place individual "events" (spacetime points) in the Lab frame and see how their coordinates change in the Observer frame.
 
 - Place "rods" (representing extended objects) in the Lab frame and witness their length contraction when viewed from a moving Observer frame.
 
-- Change the theme by clicking on the top-rigth corner of the globe.
+- Change the theme by clicking on the top-right corner of the globe.
 
 The interface is clear and user-friendly, so you're highly encouraged to poke around to understand how it works.
 
 
 ## Two consequences of special relativity
 
-In this section, we will use this simulation to vizualize two popular effects of special relativity: **time dilation** and **length contraction**.
+In this section, we will use this simulation to visualize two popular effects of special relativity: **time dilation** and **length contraction**.
 
 ### 1 - Time Dilation
 
@@ -155,12 +155,12 @@ Add multiple events at the **same spatial coordinate** but at **different times*
 
 ![Time dilation step 1](images/time_dilation_step_1.png)
 
-As you increase the `observer_velocity`, the vertical line (worldline) formed by these events in the Lab Frame will tilt. The time difference between these events will appear *longer* in the Observer frame: time dilation. For example, for ann observer moving at half the speed of light, the clock ticks every 2.3 seconds.
+As you increase the `observer_velocity`, the vertical line (worldline) formed by these events in the Lab Frame will tilt. The time difference between these events will appear *longer* in the Observer frame: time dilation. For example, for an observer moving at half of the speed of light, the clock ticks every 2.3 seconds.
 
 ![Time dilation step 2](images/time_dilation_step_2.png)
 
 > [!WARNING]
-> Note that the events doesn't happen at the same place anymore from that point of view. This is really important.
+> Note that the events don't happen at the same place anymore from that point of view, which is a crucial aspect of relativistic physics.
 
 ### Length Contraction
 
@@ -170,15 +170,15 @@ First, add a rod (or multiple ones if you want to). Next, add two events: one at
 
 ![Length contraction 1](images/length_contraction_step_1.png)
 
-Now, increase the `observer_velocity`. You will notice that the "distance" between the two events is now longer. But wait, why aren't we saying length dilation then?
+Now, increase the `observer_velocity`. You will notice that the "distance" between the two events is now longer. But wait—shouldn't that be length dilation?
 
 ![Length contraction 2](images/length_contraction_step_2.png)
 
-Well, what is **length**? In the context of special realtivity, **length** can be define as the spacial distance between two events happening at the same time. If something has move between the moment you measured its tip and the moment you measure its tail, you are no longer measured its length!
+Well, what is **length**? In the context of special relativity, **length** can be defined as the spatial distance between two events happening at the same time. If something moves between the moment you measure its tip and the moment you measure its tail, you are no longer measuring its length!
 
 That's exactly what is happening here. To get the rod's real length, the tip and the tail must be at the same time coordinate.
 
-If we consider the version of the tail happening at the time coordinate as the tip, we will notice that the distance in indeed *shorter*. And we can clearly see on the globe that the rod object is shorter along the x-axis when viewed in the Observer frame: length contraction.
+If we consider the version of the tail happening at the same time coordinate as the tip, we will notice the distance is actually *shorter*. And we can clearly see on the globe that the rod object is shorter along the x-axis when viewed in the Observer frame: length contraction.
 
 ![Length contraction 3](images/length_contraction_step_3.png)
 
@@ -194,10 +194,10 @@ $$
 - $x_{tail}$ is the space coordinate of the tail in the Lab frame
 - $\gamma$ is gamma
 
-I had to derive that formula by myself. I'll update the README later to write it down.
+I derived that formula manually to ensure accurate contraction of the rod's length. I'll update the README later to write it down.
 
 
 ## Final thoughts
-This spacetime globe project was a really challenging one! Even if I almost gave up sometimes, I came back to finish it, because it is better to finish a project, even imperfect, than trying to make it perfect and never finish it. Even if it's not perfect, I'm really proud of it. I gained so much knowledge on special relativity, C++ programming and game development.
+This spacetime globe project was a challenging one! There were moments when I almost gave up, but I pushed through and finished it—because completing an imperfect project is better than endlessly chasing perfection. Even if it’s not exactly how I imagined it, I’m proud of what I accomplished. I learned so much about special relativity, C++ programming, and game development along the way.
 
-I hope this tool would be useful to someone.
+I hope this tool will be useful to others.
