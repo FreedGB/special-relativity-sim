@@ -182,9 +182,7 @@ If we consider the version of the tail happening at the same time coordinate as 
 
 ![Length contraction 3](images/length_contraction_step_3.png)
 
-To implement the rod, I had to use a special formula to place the tail of the rod correctly:
-
-$x'_{tail}$ $=$ $-v$ $\cdot$ $t'_{tip}$ $+$ $\frac{x_{tail}}{\gamma}$
+To implement the rod, I had to use a special formula to place the tail of the rod correctly:$$x'_{tail} = -v \cdot t'_{tip} + \frac{x_{tail}}{\gamma}$$
 
 - $x'_{tail}$ is the space coordinate of the tail in the Observer frame
 - $v$ is the Observer velocity relative to the Lab frame
