@@ -185,7 +185,9 @@ If we consider the version of the tail happening at the same time coordinate as 
 To implement the rod, I had to use a special formula to place the tail of the rod correctly:
 
 $$
+
 x'_{tail} = -v \cdot t'_{tip} + \frac{x_{tail}}{\gamma}
+
 $$
 
 - $x'_{tail}$ is the space coordinate of the tail in the Observer frame
