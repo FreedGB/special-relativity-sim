@@ -21,96 +21,14 @@ This project is an interactive spacetime diagram where you can observe how event
 - Understand Lorentz transformations by seeing how coordinates of events change between these frames.
 - Demonstrate relativistic effects like time dilation and length contraction through interactive elements.
 
-
-## Getting Started (Installation)
-
-This project uses `Raylib` and `Raygui`, great libraries to make video games using C/C++.
-
-### * For Windows users
-
-1.  **Download Raylib:**
-
-    - Go to [Raylib website](https://www.raylib.com/) and click on "Download Now" to download the installer. The installer comes with MinGW compiler, so no need to download it separately.
-
-    - Once downloaded, run the Raylib installer.
-
-    - Next, you'll need to add the MinGW compiler's path to the user environment variable. To do so:
-        - Search for **Modify environment variables** and click on **Environment variables** button at the bottom
-        - Under **User variables**, select the **Path** variable, and click **Modify**. Another window will open.
-        - Click **New**, and paste the path to the `w64devkit\bin` folder, located in the folder where you installed Raylib. The default path should be `C:\raylib\w64devkit\bin`.
-        - Click **OK** in every window opened so far.
-    
-    Raylib is now installed.
-
-2. **Download Raygui:**
-
-    Raygui is typically included as a header-only library.
-    
-    - Go to [Raygui repository](https://github.com/raysan5/raygui), move to `src` and download `raygui.h`.
-
-    - Go to the `src` folder in the folder where you installed Raylib, and paste the `raygui.h` file there.
+This software is built using [`Raylib`]("https://www.raylib.com/"), a very easy library to make video games using C/C++.
 
 
-3. **Download the project:**
+## Installation process
 
-    - Go to the **Releases** section of the project, and download the zip file for Windows.
+Go to the [**Releases**]("https://github.com/FreedGB/special-relativity-sim/releases") section of the project, and download the zip file corresponding to your operating system (Windows or Linux).
 
-    - Unzip the file, launch the `spacetime_globe.exe` executable and you're ready to go!
-
-
-If you want to compile the project by yourself, feel free to download this repository and run this command:
-```bash
-g++ main.cpp -o spacetime_globe.exe -I"path/to/raylib/src" -lraylib -lgdi32 -lwinmm
-```
-Replace `path/to/raylib/src` with the actual path.
-
-
-### * For Ubuntu users
-
-1.  **Install Build Essentials:**
-
-    This ensures that `g++`, the C++ compiler, is installed. Open your terminal, and enter these commands:
-    ```bash
-    sudo apt-get update
-    sudo apt-get upgrade
-    sudo apt-get install build-essential
-    ```
-
-2.  **Install Raylib (from source, recommended for Linux):**
-
-    Then, enter these commands:
-    ```bash
-    # Install Raylib dependencies
-    sudo apt install libglfw3-dev libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglu1-mesa-dev
-
-    # Install Raylib from source
-    git clone https://github.com/raysan5/raylib.git raylib
-    cd raylib/src
-    make PLATFORM=PLATFORM_DESKTOP
-    sudo make install
-    ```
-
-3. **Download Raygui:**
-
-    It is the same as for Windows.
-    
-    - Go to [Raygui repository](https://github.com/raysan5/raygui), move to `src` and download `raygui.h`.
-
-    - Go to the `src` folder in the folder where you installed Raylib, and paste the `raygui.h` file there.
-
-4. **Download the project:**
-
-    - Go to the **Releases** section of the project, and download the zip file for Ubuntu.
-
-    - Unzip the file, launch the `spacetime_globe` file and you're ready to go!
-
-
-If you want to compile the project by yourself, feel free to download this repository and run this command:
-```bash
-g++ main.cpp -o spacetime_globe -lraylib
-```
-Replace `path/to/raylib/src` with the actual path.
-
+Unzip the file, launch the executable file (`spacetime_globe.exe` for Windows and `spacetime_globe` for Linux) and you're ready to go!
 
 
 ## Features
@@ -145,7 +63,7 @@ This tool allows you to:
 The interface is clear and user-friendly, so you're highly encouraged to poke around to understand how it works.
 
 
-## Two consequences of special relativity
+## Examples: two consequences of special relativity
 
 In this section, we will use this simulation to visualize two popular effects of special relativity: **time dilation** and **length contraction**.
 
@@ -182,7 +100,13 @@ If we consider the version of the tail happening at the same time coordinate as 
 
 ![Length contraction 3](images/length_contraction_step_3.png)
 
-To implement the rod, I had to use a special formula to place the tail of the rod correctly:$$x'_{tail} = -v \cdot t'_{tip} + \frac{x_{tail}}{\gamma}$$
+To implement the rod, I had to use a special formula to place the tail of the rod correctly:
+
+$$
+
+x'_{tail} = -v \cdot t'_{tip} + \frac{x_{tail}}{\gamma}
+
+$$
 
 - $x'_{tail}$ is the space coordinate of the tail in the Observer frame
 - $v$ is the Observer velocity relative to the Lab frame
