@@ -26,7 +26,7 @@ This software is built using [`Raylib`]("https://www.raylib.com/"), a very easy 
 
 ## Installation process
 
-Go to the **[Releases]("https://github.com/FreedGB/special-relativity-sim/releases")** section of the project, and download the zip file corresponding to your operating system (Windows or Linux).
+Go to the [Releases]("https://github.com/FreedGB/special-relativity-sim/releases") section of the project, and download the zip file corresponding to your operating system (Windows or Linux).
 
 Unzip the file, launch the executable file (`spacetime_globe.exe` for Windows and `spacetime_globe` for Linux) and you're ready to go!
 
